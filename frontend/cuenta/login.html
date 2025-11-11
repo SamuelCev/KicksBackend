@@ -70,7 +70,7 @@
             >
           </div>
 
-          <!-- Recordarme y Olvidé contraseña -->
+          <!-- Olvidé contraseña -->
           <div class="form-actions">
             <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
           </div>
@@ -95,7 +95,12 @@
   <!-- Scripts -->
   <script type="module">
     import { ThemeBtn } from '../components/theme-btn.js';
+    import { Header } from '../components/header.js';
+  
     ThemeBtn();
+  
+    const header = Header();
+    document.body.insertBefore(header, document.body.firstChild);
   </script>
   <script src="../js/login.js"></script>
 

@@ -177,19 +177,15 @@
   }
 
   .login-brand {
-    min-height: 200px;
-  }
-
-  .brand-logo {
-    max-width: 200px;
-  }
-
-  .brand-tagline {
-    font-size: 1.2rem;
+    display: none;
   }
 
   .login-form-section {
     padding: 20px;
+    flex: 1;
+    min-height: calc(100vh - 70px);
+    align-items: flex-start;
+    padding-top: 40px;
   }
 
   .login-title {
