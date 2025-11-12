@@ -2,6 +2,19 @@ import { cartIcon, userIcon, menuIcon, closeIcon } from '../js/utils/icons.js';
 import { isAuthenticated } from '../js/utils/auth.js';
 
 /**
+ * Detecta la ruta base según la ubicación del archivo
+ */
+function getBasePath() {
+  const path = window.location.pathname;
+  // Si estamos en la raíz (index.html) o en frontend/, no usar ../
+  if (path === '/' || path.endsWith('/index.html') || path.endsWith('/frontend/') || path.endsWith('/frontend/index.html')) {
+    return '';
+  }
+  // Si estamos en un subdirectorio, usar ../
+  return '../';
+}
+
+/**
  * Crea y renderiza el navbar
  */
 export function Header() {
@@ -9,21 +22,22 @@ export function Header() {
   header.className = 'navbar';
   
   const isLoggedIn = isAuthenticated();
+  const basePath = getBasePath();
   
   header.innerHTML = `
     <nav class="navbar-container">
       <!-- Logo a la izquierda -->
       <div class="navbar-logo">
-        <a href="../index.html">
-          <img src="../assets/images/logo.png" alt="KICKS Logo" class="logo-img">
+        <a href="${basePath}index.html">
+          <img src="${basePath}assets/img/kicks_logo.png" alt="KICKS Logo" class="logo-img">
         </a>
       </div>
       
       <!-- Navegación en el centro -->
       <ul class="navbar-nav">
-        <li><a href="../tienda/categorias.html" class="nav-link">Categorías</a></li>
-        <li><a href="../tienda/nosotros.html" class="nav-link">Nosotros</a></li>
-        <li><a href="../tienda/contacto.html" class="nav-link">Contacto</a></li>
+        <li><a href="${basePath}tienda/productos.html" class="nav-link">Productos</a></li>
+        <li><a href="${basePath}tienda/nosotros.html" class="nav-link">Nosotros</a></li>
+        <li><a href="${basePath}tienda/contacto.html" class="nav-link">Contacto</a></li>
       </ul>
       
       <!-- Acciones a la derecha -->
@@ -36,7 +50,7 @@ export function Header() {
             ${userIcon}
           </button>
         ` : `
-          <a href="../cuenta/login.html" class="btn btn-primary btn-login-nav">
+          <a href="${basePath}cuenta/login.html" class="btn btn-primary btn-login-nav">
             Login
           </a>
         `}
@@ -57,9 +71,9 @@ export function Header() {
         </button>
       </div>
       <ul class="mobile-nav">
-        <li><a href="../tienda/categorias.html" class="mobile-nav-link">Categorías</a></li>
-        <li><a href="../tienda/nosotros.html" class="mobile-nav-link">Nosotros</a></li>
-        <li><a href="../tienda/contacto.html" class="mobile-nav-link">Contacto</a></li>
+        <li><a href="${basePath}tienda/productos.html" class="mobile-nav-link">Productos</a></li>
+        <li><a href="${basePath}tienda/nosotros.html" class="mobile-nav-link">Nosotros</a></li>
+        <li><a href="${basePath}tienda/contacto.html" class="mobile-nav-link">Contacto</a></li>
         ${isLoggedIn ? `
           <li>
             <button class="mobile-nav-link mobile-nav-icon" aria-label="Carrito">
@@ -75,7 +89,7 @@ export function Header() {
           </li>
         ` : `
           <li>
-            <a href="../cuenta/login.html" class="btn btn-primary btn-login-mobile">
+            <a href="${basePath}cuenta/login.html" class="btn btn-primary btn-login-mobile">
               Login
             </a>
           </li>

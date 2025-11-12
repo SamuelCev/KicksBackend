@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="./assets/img/favicon.ico" type="image/x-icon">
+  <title>KICKS - Calzado de Calidad</title>
+  
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/globals.css">
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="favicon" href="">
+  
+  <!-- Script para aplicar tema antes del render -->
+  <script>
+    (function() {
+      const storedTheme = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = storedTheme || (prefersDark ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Encuentra tu estilo perfecto</h1>
+      <p class="hero-subtitle">Calzado de calidad que combina comodidad y diseño</p>
+      <div class="hero-buttons">
+        <a href="tienda/categorias.html" class="btn btn-primary btn-hero">Explorar colección</a>
+        <a href="tienda/categorias.html" class="btn btn-secondary btn-hero">Ver ofertas</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <!-- Imagen de fondo del hero - se puede cambiar por una imagen real -->
+      <div class="hero-placeholder"></div>
+    </div>
+  </section>
+
+  <!-- Categorías Destacadas -->
+  <section class="categories">
+    <div class="container">
+      <h2 class="section-title">Categorías populares</h2>
+      <div class="categories-grid">
+        <div class="category-card">
+          <div class="category-image">
+            <div class="category-placeholder"></div>
+          </div>
+          <h3 class="category-name">Senderismo</h3>
+          <a href="tienda/categorias.html" class="category-link">Ver más →</a>
+        </div>
+        <div class="category-card">
+          <div class="category-image">
+            <div class="category-placeholder"></div>
+          </div>
+          <h3 class="category-name">Basketball</h3>
+          <a href="tienda/categorias.html" class="category-link">Ver más →</a>
+        </div>
+        <div class="category-card">
+          <div class="category-image">
+            <div class="category-placeholder"></div>
+          </div>
+          <h3 class="category-name">Running</h3>
+          <a href="tienda/categorias.html" class="category-link">Ver más →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Productos Destacados -->
+  <section class="featured-products">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Productos destacados</h2>
+        <a href="tienda/categorias.html" class="section-link">Ver todos →</a>
+      </div>
+      <div class="products-grid">
+        <!-- Producto 1 -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="product-placeholder"></div>
+            <div class="product-badge">Nuevo</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">Zapatilla Deportiva Premium</h3>
+            <p class="product-category">Deportivos</p>
+            <div class="product-footer">
+              <span class="product-price">$89.99</span>
+              <button class="product-cart-btn" aria-label="Agregar al carrito">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Producto 2 -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="product-placeholder"></div>
+            <div class="product-badge product-badge-sale">-20%</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">Bota Casual Elegante</h3>
+            <p class="product-category">Casuales</p>
+            <div class="product-footer">
+              <div class="product-price-group">
+                <span class="product-price-old">$120.00</span>
+                <span class="product-price">$96.00</span>
+              </div>
+              <button class="product-cart-btn" aria-label="Agregar al carrito">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Producto 3 -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="product-placeholder"></div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">Zapato Formal Clásico</h3>
+            <p class="product-category">Formales</p>
+            <div class="product-footer">
+              <span class="product-price">$149.99</span>
+              <button class="product-cart-btn" aria-label="Agregar al carrito">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Producto 4 -->
+        <div class="product-card">
+          <div class="product-image">
+            <div class="product-placeholder"></div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">Sneaker Urbano Moderno</h3>
+            <p class="product-category">Urbanos</p>
+            <div class="product-footer">
+              <span class="product-price">$79.99</span>
+              <button class="product-cart-btn" aria-label="Agregar al carrito">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Ofertas -->
+  <section class="offers">
+    <div class="container">
+      <div class="offers-content">
+        <div class="offers-text">
+          <h2 class="offers-title">Ofertas especiales</h2>
+          <p class="offers-description">Aprovecha nuestras promociones exclusivas y obtén hasta 30% de descuento en seleccionados productos</p>
+          <a href="tienda/categorias.html" class="btn btn-primary">Ver ofertas</a>
+        </div>
+        <div class="offers-image">
+          <div class="offers-placeholder"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Beneficios -->
+  <section class="benefits">
+    <div class="container">
+      <div class="benefits-grid">
+        <div class="benefit-item">
+          <div class="benefit-icon">🚚</div>
+          <h3 class="benefit-title">Envío gratis</h3>
+          <p class="benefit-description">En compras mayores a $50</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">↩️</div>
+          <h3 class="benefit-title">Devoluciones fáciles</h3>
+          <p class="benefit-description">Hasta 30 días para cambiar de opinión</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">🔒</div>
+          <h3 class="benefit-title">Pago seguro</h3>
+          <p class="benefit-description">Transacciones 100% protegidas</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">⭐</div>
+          <h3 class="benefit-title">Calidad garantizada</h3>
+          <p class="benefit-description">Productos de la más alta calidad</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { ThemeBtn } from './components/theme-btn.js';
+    import { Header } from './components/header.js';
+    import { Footer } from './components/footer.js';
+  
+    ThemeBtn();
+  
+    const header = Header();
+    document.body.insertBefore(header, document.body.firstChild);
+    
+    const footer = Footer();
+    document.body.appendChild(footer);
+  </script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>
+
