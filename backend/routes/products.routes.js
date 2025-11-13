@@ -5,9 +5,9 @@ const router = express.Router();
 
 router.get('/', getAllProducts);
 router.post('/', createProduct);
-router.patch('/:id', updateProduct);
+router.get('/randoms', productosAleatorios);
+router.put('/:id', updateProduct);
 router.delete('/:id', deleteProduct);
 router.get('/:id', getProductById);
-router.get('/randoms', productosAleatorios);
 
 module.exports = router;

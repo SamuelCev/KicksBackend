@@ -1,4 +1,4 @@
-const pool = require('../services/dbConnection');
+const { pool } = require('../services/dbConnection');
 
 exports.getAllProducts = async (req, res) => {
     const { categoria, hasDescuento } = req.query;
@@ -81,7 +81,7 @@ exports.updateProduct = async (req, res) => {
 
     try {
         const [result] = await pool.query(
-            'UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ?, categoria = ?, descuento = ?, hasDescuento = ? WHERE id = ?',
+            'UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ?, categoria = ?, descuento = ?, hasDescuento = ? WHERE id = ? AND estado = 1',
             [nombre, descripcion, precio, stock, categoria, descuento, descuento > 0 ? 1 : 0, id]
         );
 
