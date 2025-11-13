@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../assets/img/favicon.ico" type="image/x-icon">
+  <title>Productos - KICKS</title>
+  
+  <!-- Estilos -->
+  <link rel="stylesheet" href="../css/globals.css">
+  <link rel="stylesheet" href="../css/login.css">
+  
+  <!-- Script para aplicar tema antes del render -->
+  <script>
+    (function() {
+      const storedTheme = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = storedTheme || (prefersDark ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+</head>
+<body>
+
+
+
+  <!-- Scripts -->
+  <script type="module">
+    import { ThemeBtn } from '../components/theme-btn.js';
+    import { Header } from '../components/header.js';
+  
+    ThemeBtn();
+  
+    const header = Header();
+    document.body.insertBefore(header, document.body.firstChild);
+  </script>
+  <script src="../js/login.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,164 @@
+/* ============================================
+   CONTENEDOR PRINCIPAL DEL REGISTRO
+   ============================================ */
+.registro-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ============================================
+   SECCIÓN IZQUIERDA
+   ============================================ */
+.registro-brand {
+  flex: 1;
+  background: #121110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: sticky;  
+  top: 70px;            
+  height: calc(100vh - 70px);
+  overflow: hidden;
+}
+
+.brand-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.brand-logo {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
+}
+
+.brand-tagline {
+  color: var(--color-blanco);
+  font-size: 1.5rem;
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+/* ============================================
+   SECCIÓN DERECHA 
+   ============================================ */
+.registro-form-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: var(--color-fondo);
+  min-height: 100vh;
+}
+
+.registro-form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.registro-header {
+  margin-bottom: 40px;
+}
+
+.registro-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--color-texto);
+  margin-bottom: 8px;
+  position: relative;
+  display: inline-block;
+}
+
+.registro-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--color-acento);
+  border-radius: 2px;
+}
+
+.registro-subtitle {
+  color: var(--color-secundario);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 12px;
+}
+
+/* ============================================
+   FORMULARIO
+   ============================================ */
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-texto);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.btn-registro {
+  width: 100%;
+}
+
+/* ============================================
+   LOGIN LINK
+   ============================================ */
+.login-link {
+  text-align: center;
+  margin-top: 24px;
+  color: var(--color-secundario);
+  font-size: 0.9rem;
+}
+
+.login-link a {
+  color: var(--color-acento);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.3s ease;
+}
+
+.login-link a:hover {
+  opacity: 0.8;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .registro-container {
+    flex-direction: column;
+  }
+
+  .registro-brand {
+    display: none;
+  }
+  
+  .registro-title::after {
+    width: 50px;
+  }
+
+  .registro-form-section {
+    padding: 20px;
+    flex: 1;
+    min-height: calc(100vh - 70px);
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+
+  .registro-title {
+    font-size: 1.5rem;
+  }
+}
+
