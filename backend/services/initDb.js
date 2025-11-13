@@ -25,9 +25,10 @@ async function initTables() {
             descripcion TEXT NOT NULL,
             precio DECIMAL(10, 2) NOT NULL,
             stock INT NOT NULL,
-            categoria_id INT,
+            categoria VARCHAR(50) NOT NULL,
             descuento DECIMAL(3, 2) DEFAULT 0,
-            hasDescuento TINYINT DEFAULT 0,
+            hasDescuento TINYINT,
+            estado TINYINT DEFAULT 1,
             INDEX idx_hasDescuento (hasDescuento)
           )
         `
