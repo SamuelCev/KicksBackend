@@ -8,7 +8,7 @@ exports.getCartByUserId = async (req, res) => {
         const [rows] = await pool.query('SELECT * FROM carrito_items WHERE usuario_id = ?', [userId]);
 
         for (const row of rows) {
-            const [productRows] =  await pool.query('SELECT nombre, precio FROM productos WHERE id = ?', [row.producto_id]);
+            const [productRows] = await pool.query('SELECT nombre, precio, stock FROM productos WHERE id = ? AND estado = 1', [row.producto_id]);
             const [imagenes] = await pool.query(
                 'SELECT url FROM producto_imagenes WHERE producto_id = ? LIMIT 1',
                 [row.producto_id]
@@ -64,5 +64,61 @@ exports.removeItemFromCart = async (req, res) => {
     } catch (error) {
         console.error("Error al eliminar el ítem del carrito:", error);
         res.status(500).json({ message: "Error al eliminar el ítem del carrito" });
+    }
+}
+
+exports.updateItemQuantity = async (req, res) => {
+    //const userId  = req.userId;
+    const userId = 1; // Temporalmente fijo para pruebas
+
+    const { itemId } = req.params;
+    const { cantidad } = req.body;
+    
+    if (cantidad === undefined || cantidad < 1) {
+        return res.status(400).json({ message: "La cantidad debe ser al menos 1" });
+    }
+
+    try {
+        // Verificar que el item existe y obtener el producto_id
+        const [items] = await pool.query(
+            'SELECT producto_id FROM carrito_items WHERE id = ? AND usuario_id = ?',
+            [itemId, userId]
+        );
+        
+        if (items.length === 0) {
+            return res.status(404).json({ message: "Ítem no encontrado en el carrito" });
+        }
+
+        // Verificar stock disponible
+        const [products] = await pool.query(
+            'SELECT stock FROM productos WHERE id = ? AND estado = 1',
+            [items[0].producto_id]
+        );
+
+        if (products.length === 0) {
+            return res.status(404).json({ message: "Producto no encontrado" });
+        }
+
+        if (cantidad > products[0].stock) {
+            return res.status(400).json({ 
+                message: "Cantidad solicitada excede el stock disponible",
+                stockDisponible: products[0].stock
+            });
+        }
+
+        // Actualizar cantidad
+        const [result] = await pool.query(
+            'UPDATE carrito_items SET cantidad = ? WHERE id = ? AND usuario_id = ?',
+            [cantidad, itemId, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "No se pudo actualizar el ítem" });
+        }
+
+        res.json({ message: "Cantidad actualizada correctamente", itemId, cantidad });
+    } catch (error) {
+        console.error("Error al actualizar cantidad:", error);
+        res.status(500).json({ message: "Error al actualizar la cantidad" });
     }
 }

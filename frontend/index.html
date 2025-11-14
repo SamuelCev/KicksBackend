@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="./assets/img/favicon.ico" type="image/x-icon">
-  <title>KICKS - Calzado de Calidad</title>
+  <title>KICKS - Home</title>
   
   <!-- Estilos -->
   <link rel="stylesheet" href="css/globals.css">
   <link rel="stylesheet" href="css/index.css">
-  <link rel="favicon" href="">
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <!-- Script para aplicar tema antes del render -->
   <script>
@@ -23,20 +26,75 @@
 </head>
 <body>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <h1 class="hero-title">Encuentra tu estilo perfecto</h1>
-      <p class="hero-subtitle">Calzado de calidad que combina comodidad y diseño</p>
-      <div class="hero-buttons">
-        <a href="tienda/categorias.html" class="btn btn-primary btn-hero">Explorar colección</a>
-        <a href="tienda/categorias.html" class="btn btn-secondary btn-hero">Ver ofertas</a>
+  <!-- Carousel Section -->
+  <section class="carousel">
+    <div class="carousel-container">
+      <div class="carousel-slides">
+        <!-- Slide 1 -->
+        <div class="carousel-slide active">
+          <div class="carousel-overlay"></div>
+          <div class="carousel-content">
+            <h2 class="carousel-title">Encuentra tu estilo perfecto</h2>
+            <p class="carousel-subtitle">Calzado de calidad que combina comodidad y diseño</p>
+            <div class="carousel-buttons">
+              <a href="tienda/productos.html" class="btn btn-primary btn-carousel">Explorar colección</a>
+              <a href="tienda/productos.html" class="btn btn-secondary btn-carousel">Ver ofertas</a>
+            </div>
+          </div>
+          <div class="carousel-image">
+            <div class="carousel-placeholder" style="background: linear-gradient(135deg, #1a1a1a 0%, #d01110 50%, #0a0a0a 100%);"></div>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="carousel-slide">
+          <div class="carousel-overlay"></div>
+          <div class="carousel-content">
+            <h2 class="carousel-title">Nuevas Colecciones</h2>
+            <p class="carousel-subtitle">Descubre las últimas tendencias en calzado deportivo</p>
+            <div class="carousel-buttons">
+              <a href="tienda/productos.html" class="btn btn-primary btn-carousel">Ver novedades</a>
+            </div>
+          </div>
+          <div class="carousel-image">
+            <div class="carousel-placeholder" style="background: linear-gradient(135deg, #0a0a0a 0%, #121110 50%, #d01110 100%);"></div>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="carousel-slide">
+          <div class="carousel-overlay"></div>
+          <div class="carousel-content">
+            <h2 class="carousel-title">Ofertas Especiales</h2>
+            <p class="carousel-subtitle">Hasta 30% de descuento en productos seleccionados</p>
+            <div class="carousel-buttons">
+              <a href="tienda/productos.html" class="btn btn-primary btn-carousel">Aprovechar ofertas</a>
+            </div>
+          </div>
+          <div class="carousel-image">
+            <div class="carousel-placeholder" style="background: linear-gradient(135deg, #d01110 0%, #121110 50%, #1a1a1a 100%);"></div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="hero-image">
-      <!-- Imagen de fondo del hero - se puede cambiar por una imagen real -->
-      <div class="hero-placeholder"></div>
+
+      <!-- Controles del Carousel -->
+      <button class="carousel-control carousel-control-prev" aria-label="Anterior">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="carousel-control carousel-control-next" aria-label="Siguiente">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Indicadores del Carousel -->
+      <div class="carousel-indicators">
+        <button class="carousel-indicator active" data-slide="0" aria-label="Ir a diapositiva 1"></button>
+        <button class="carousel-indicator" data-slide="1" aria-label="Ir a diapositiva 2"></button>
+        <button class="carousel-indicator" data-slide="2" aria-label="Ir a diapositiva 3"></button>
+      </div>
     </div>
   </section>
 
@@ -45,26 +103,26 @@
     <div class="container">
       <h2 class="section-title">Categorías populares</h2>
       <div class="categories-grid">
-        <div class="category-card">
+        <div class="category-card" onclick="window.location.href='tienda/productos.html?categoria=senderismo'">
           <div class="category-image">
             <div class="category-placeholder"></div>
           </div>
           <h3 class="category-name">Senderismo</h3>
-          <a href="tienda/categorias.html" class="category-link">Ver más →</a>
+          <a class="category-link">Ver más →</a>
         </div>
-        <div class="category-card">
+        <div class="category-card" onclick="window.location.href='tienda/productos.html?categoria=basketball'">
           <div class="category-image">
             <div class="category-placeholder"></div>
           </div>
           <h3 class="category-name">Basketball</h3>
-          <a href="tienda/categorias.html" class="category-link">Ver más →</a>
+          <a class="category-link">Ver más →</a>
         </div>
-        <div class="category-card">
+        <div class="category-card" onclick="window.location.href='tienda/productos.html?categoria=running'">
           <div class="category-image">
             <div class="category-placeholder"></div>
           </div>
           <h3 class="category-name">Running</h3>
-          <a href="tienda/categorias.html" class="category-link">Ver más →</a>
+          <a class="category-link">Ver más →</a>
         </div>
       </div>
     </div>
@@ -75,109 +133,67 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title">Productos destacados</h2>
-        <a href="tienda/categorias.html" class="section-link">Ver todos →</a>
+        <a href="tienda/productos.html" class="section-link">Ver todos →</a>
       </div>
-      <div class="products-grid">
-        <!-- Producto 1 -->
-        <div class="product-card">
-          <div class="product-image">
-            <div class="product-placeholder"></div>
-            <div class="product-badge">Nuevo</div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-name">Zapatilla Deportiva Premium</h3>
-            <p class="product-category">Deportivos</p>
-            <div class="product-footer">
-              <span class="product-price">$89.99</span>
-              <button class="product-cart-btn" aria-label="Agregar al carrito">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- Producto 2 -->
-        <div class="product-card">
-          <div class="product-image">
-            <div class="product-placeholder"></div>
-            <div class="product-badge product-badge-sale">-20%</div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-name">Bota Casual Elegante</h3>
-            <p class="product-category">Casuales</p>
-            <div class="product-footer">
-              <div class="product-price-group">
-                <span class="product-price-old">$120.00</span>
-                <span class="product-price">$96.00</span>
-              </div>
-              <button class="product-cart-btn" aria-label="Agregar al carrito">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- Producto 3 -->
-        <div class="product-card">
-          <div class="product-image">
-            <div class="product-placeholder"></div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-name">Zapato Formal Clásico</h3>
-            <p class="product-category">Formales</p>
-            <div class="product-footer">
-              <span class="product-price">$149.99</span>
-              <button class="product-cart-btn" aria-label="Agregar al carrito">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- Producto 4 -->
-        <div class="product-card">
-          <div class="product-image">
-            <div class="product-placeholder"></div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-name">Sneaker Urbano Moderno</h3>
-            <p class="product-category">Urbanos</p>
-            <div class="product-footer">
-              <span class="product-price">$79.99</span>
-              <button class="product-cart-btn" aria-label="Agregar al carrito">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
+      <div class="products-grid" id="featured-products-grid">
+        <!-- Los productos se cargarán dinámicamente desde el backend -->
+        <div class="products-loading">
+          <div class="loading-spinner"></div>
+          <p>Cargando productos...</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Sección de Ofertas -->
-  <section class="offers">
+  <!-- Sección de Marcas -->
+  <section class="brands">
     <div class="container">
-      <div class="offers-content">
-        <div class="offers-text">
-          <h2 class="offers-title">Ofertas especiales</h2>
-          <p class="offers-description">Aprovecha nuestras promociones exclusivas y obtén hasta 30% de descuento en seleccionados productos</p>
-          <a href="tienda/categorias.html" class="btn btn-primary">Ver ofertas</a>
-        </div>
-        <div class="offers-image">
-          <div class="offers-placeholder"></div>
+      <h2 class="section-title">Marcas que confiamos</h2>
+      <div class="brands-carousel-wrapper">
+        <div class="brands-carousel">
+          <div class="brand-item">
+            <img src="assets/img/brands/nike.png" alt="Nike" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/adidas.png" alt="Adidas" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/puma.png" alt="Puma" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/jordan.png" alt="Jordan" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/new-balance.png" alt="New Balance" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/salomon.png" alt="Salomon" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/under-armour.png" alt="Under Armour" class="brand-logo">
+          </div>
+          <!-- Duplicados para loop infinito -->
+          <div class="brand-item">
+            <img src="assets/img/brands/nike.png" alt="Nike" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/adidas.png" alt="Adidas" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/puma.png" alt="Puma" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/jordan.png" alt="Jordan" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/new-balance.png" alt="New Balance" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/salomon.png" alt="Salomon" class="brand-logo">
+          </div>
+          <div class="brand-item">
+            <img src="assets/img/brands/under-armour.png" alt="Under Armour" class="brand-logo">
+          </div>
         </div>
       </div>
     </div>
@@ -186,26 +202,48 @@
   <!-- Sección de Beneficios -->
   <section class="benefits">
     <div class="container">
+      <h2 class="section-title">¿Por qué comprar con nosotros?</h2>
       <div class="benefits-grid">
         <div class="benefit-item">
-          <div class="benefit-icon">🚚</div>
+          <div class="benefit-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+          </div>
           <h3 class="benefit-title">Envío gratis</h3>
-          <p class="benefit-description">En compras mayores a $50</p>
+          <p class="benefit-description">En compras superiores a $50. Recibe tu pedido en 3-5 días hábiles</p>
         </div>
         <div class="benefit-item">
-          <div class="benefit-icon">↩️</div>
+          <div class="benefit-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+          </div>
           <h3 class="benefit-title">Devoluciones fáciles</h3>
-          <p class="benefit-description">Hasta 30 días para cambiar de opinión</p>
+          <p class="benefit-description">Hasta 30 días para cambiar de opinión. Sin preguntas, sin complicaciones</p>
         </div>
         <div class="benefit-item">
-          <div class="benefit-icon">🔒</div>
+          <div class="benefit-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
           <h3 class="benefit-title">Pago seguro</h3>
-          <p class="benefit-description">Transacciones 100% protegidas</p>
+          <p class="benefit-description">Transacciones 100% protegidas con encriptación SSL</p>
         </div>
         <div class="benefit-item">
-          <div class="benefit-icon">⭐</div>
+          <div class="benefit-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+            </svg>
+          </div>
           <h3 class="benefit-title">Calidad garantizada</h3>
-          <p class="benefit-description">Productos de la más alta calidad</p>
+          <p class="benefit-description">Productos de las mejores marcas con garantía de satisfacción</p>
         </div>
       </div>
     </div>
@@ -225,7 +263,7 @@
     const footer = Footer();
     document.body.appendChild(footer);
   </script>
-  <script src="js/main.js"></script>
+  <script src="js/index.js"></script>
 
 </body>
 </html>

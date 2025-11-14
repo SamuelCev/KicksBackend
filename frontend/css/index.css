@@ -1,17 +1,45 @@
 /* ============================================
-   HERO SECTION
+   CAROUSEL SECTION
    ============================================ */
-.hero {
+.carousel {
   position: relative;
-  min-height: 90vh;
+  width: 100%;
+  overflow: hidden;
+  margin-top: 0px;
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  min-height: 500px;
+}
+
+.carousel-slides {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  margin-top: 70px;
 }
 
-.hero-overlay {
+.carousel-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.carousel-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -21,7 +49,7 @@
   z-index: 1;
 }
 
-.hero-content {
+.carousel-content {
   position: relative;
   z-index: 2;
   text-align: center;
@@ -29,7 +57,7 @@
   padding: 40px 20px;
 }
 
-.hero-title {
+.carousel-title {
   font-size: 3.5rem;
   font-weight: 700;
   color: var(--color-blanco);
@@ -38,7 +66,7 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.hero-subtitle {
+.carousel-subtitle {
   font-size: 1.5rem;
   color: var(--color-blanco);
   margin-bottom: 40px;
@@ -46,14 +74,14 @@
   opacity: 0.95;
 }
 
-.hero-buttons {
+.carousel-buttons {
   display: flex;
   gap: 20px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
-.btn-hero {
+.btn-carousel {
   padding: 16px 32px;
   font-size: 1.1rem;
   font-weight: 600;
@@ -72,7 +100,7 @@
   color: var(--color-negro);
 }
 
-.hero-image {
+.carousel-image {
   position: absolute;
   top: 0;
   left: 0;
@@ -81,19 +109,77 @@
   z-index: 0;
 }
 
-.hero-placeholder {
+.carousel-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1a1a1a 0%, #121110 50%, #0a0a0a 100%);
-  background-image: url('../assets/images/hero-bg.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-/* Si no hay imagen, usar gradiente */
-.hero-placeholder:not([style*="background-image"]) {
-  background: linear-gradient(135deg, #1a1a1a 0%, #121110 50%, #0a0a0a 100%);
+/* Controles del Carousel */
+.carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  background-color: rgba(255, 255, 255, 0.3);
+  color: var(--color-blanco);
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.carousel-control:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-control-prev {
+  left: 20px;
+}
+
+.carousel-control-next {
+  right: 20px;
+}
+
+/* Indicadores del Carousel */
+.carousel-indicators {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 12px;
+}
+
+.carousel-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-indicator:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+  transform: scale(1.2);
+}
+
+.carousel-indicator.active {
+  background-color: var(--color-acento);
+  width: 30px;
+  border-radius: 6px;
 }
 
 /* ============================================
@@ -335,52 +421,179 @@
 }
 
 /* ============================================
-   OFFERS SECTION
+   BRANDS SECTION
    ============================================ */
-.offers {
+.brands {
   padding: 80px 0;
   background-color: var(--color-fondo);
-}
-
-.offers-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: center;
-}
-
-.offers-text {
-  padding: 20px;
-}
-
-.offers-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--color-texto);
-  margin-bottom: 20px;
-}
-
-.offers-description {
-  font-size: 1.1rem;
-  color: var(--color-secundario);
-  margin-bottom: 30px;
-  line-height: 1.6;
-}
-
-.offers-image {
-  width: 100%;
-  height: 400px;
-  border-radius: 16px;
   overflow: hidden;
 }
 
-.offers-placeholder {
+.brands-carousel-wrapper {
+  margin-top: 40px;
+  overflow: hidden;
+  position: relative;
+}
+
+.brands-carousel {
+  display: flex;
+  gap: 60px;
+  animation: scrollBrands 30s linear infinite;
+  width: fit-content;
+}
+
+.brands-carousel:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scrollBrands {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.brand-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+  flex-shrink: 0;
+  min-width: 150px;
+}
+
+.brand-item:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.brand-logo {
+  max-width: 120px;
+  max-height: 60px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+.brand-item:hover .brand-logo {
+  filter: grayscale(0%);
+}
+
+/* ============================================
+   PRODUCTS LOADING
+   ============================================ */
+.products-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--color-input-border);
+  border-top: 4px solid var(--color-acento);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.products-loading p {
+  color: var(--color-secundario);
+  font-size: 1.1rem;
+}
+
+.products-error {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.products-error p {
+  color: var(--color-secundario);
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.products-error .btn {
+  margin-top: 20px;
+}
+
+.products-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-secundario);
+  font-size: 1.1rem;
+}
+
+/* ============================================
+   PRODUCT CARD - ESTADOS ADICIONALES
+   ============================================ */
+.product-card--out-of-stock {
+  opacity: 0.7;
+}
+
+.product-card--out-of-stock .product-image {
+  position: relative;
+}
+
+.product-card--out-of-stock .product-image::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.product-badge--new {
+  background-color: #4CAF50;
+}
+
+.product-badge--sold-out {
+  background-color: #757575;
+  z-index: 2;
+}
+
+.product-placeholder-bg {
+  background: linear-gradient(135deg, var(--color-input-bg) 0%, var(--color-input-border) 100%);
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--color-input-bg) 0%, var(--color-input-border) 100%);
-  background-image: url('../assets/images/offers-bg.jpg');
-  background-size: cover;
-  background-position: center;
+}
+
+.product-cart-btn--disabled {
+  background-color: var(--color-gris);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.product-cart-btn--disabled:hover {
+  background-color: var(--color-gris);
+  transform: none;
+}
+
+.product-cart-btn--added {
+  background-color: #4CAF50;
+  animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
 }
 
 /* ============================================
@@ -395,16 +608,35 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 40px;
+  margin-top: 40px;
 }
 
 .benefit-item {
   text-align: center;
   padding: 30px 20px;
+  background-color: var(--color-fondo);
+  border-radius: 16px;
+  border: 1px solid var(--color-input-border);
+  transition: all 0.3s ease;
+}
+
+.benefit-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-acento);
 }
 
 .benefit-icon {
-  font-size: 3rem;
   margin-bottom: 20px;
+  color: var(--color-acento);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.benefit-icon svg {
+  width: 48px;
+  height: 48px;
 }
 
 .benefit-title {
@@ -424,27 +656,44 @@
    RESPONSIVE
    ============================================ */
 @media (max-width: 768px) {
-  .hero {
-    min-height: 70vh;
-    margin-top: 70px;
+  .carousel-container {
+    height: 60vh;
+    min-height: 450px;
   }
 
-  .hero-title {
+  .carousel-title {
     font-size: 2.5rem;
   }
 
-  .hero-subtitle {
+  .carousel-subtitle {
     font-size: 1.2rem;
   }
 
-  .hero-buttons {
+  .carousel-buttons {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .btn-hero {
+  .btn-carousel {
     width: 100%;
     text-align: center;
+  }
+
+  .carousel-control {
+    width: 40px;
+    height: 40px;
+  }
+
+  .carousel-control-prev {
+    left: 10px;
+  }
+
+  .carousel-control-next {
+    right: 10px;
+  }
+
+  .carousel-indicators {
+    bottom: 20px;
   }
 
   .section-title {
@@ -462,13 +711,12 @@
     gap: 20px;
   }
 
-  .offers-content {
-    grid-template-columns: 1fr;
+  .brands-carousel {
     gap: 40px;
   }
 
-  .offers-image {
-    height: 300px;
+  .brand-item {
+    min-width: 120px;
   }
 
   .benefits-grid {
@@ -478,12 +726,27 @@
 }
 
 @media (max-width: 480px) {
-  .hero-title {
+  .carousel-container {
+    height: 50vh;
+    min-height: 400px;
+  }
+
+  .carousel-title {
     font-size: 2rem;
   }
 
-  .hero-subtitle {
+  .carousel-subtitle {
     font-size: 1rem;
+  }
+
+  .carousel-control {
+    width: 35px;
+    height: 35px;
+  }
+
+  .carousel-control svg {
+    width: 20px;
+    height: 20px;
   }
 
   .section-title {
@@ -498,6 +761,23 @@
   .category-image,
   .product-image {
     height: 200px;
+  }
+
+  .brands-carousel {
+    gap: 30px;
+  }
+
+  .brand-item {
+    min-width: 100px;
+  }
+
+  .brand-logo {
+    max-width: 100px;
+    max-height: 50px;
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
   }
 }
 

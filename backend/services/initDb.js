@@ -27,6 +27,7 @@ async function initTables() {
             stock INT NOT NULL,
             categoria VARCHAR(50) NOT NULL,
             descuento DECIMAL(3, 2) DEFAULT 0,
+            imagen VARCHAR(255),
             hasDescuento TINYINT,
             estado TINYINT DEFAULT 1,
             INDEX idx_hasDescuento (hasDescuento)

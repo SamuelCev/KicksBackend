@@ -53,7 +53,6 @@ export function Footer() {
         <ul class="footer-links">
           <li><a href="${basePath}index.html">Inicio</a></li>
           <li><a href="${basePath}tienda/productos.html">Productos</a></li>
-          <li><a href="${basePath}tienda/categorias.html">Categorías</a></li>
           <li><a href="${basePath}tienda/nosotros.html">Nosotros</a></li>
           <li><a href="${basePath}tienda/contacto.html">Contacto</a></li>
         </ul>

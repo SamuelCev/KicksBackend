@@ -19,8 +19,8 @@ router.post('/', upload.array('imagenes', 20), createProduct); // Permite hasta 
 router.get('/randoms', productosAleatorios);
 router.put('/:id', updateProduct);
 router.delete('/:id', deleteProduct);
-router.get('/:id', getProductById);
 router.get('/stock/categoria/:categoria', getStockByCategory);
+router.get('/:id', getProductById);
 
 // Gestión de imágenes
 router.post('/:id/imagenes', upload.array('imagenes', 5), addProductImages); // Agregar imágenes

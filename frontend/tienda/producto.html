@@ -4,11 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="../assets/img/favicon.ico" type="image/x-icon">
-  <title>Productos - KICKS</title>
+  <title>Producto - KICKS</title>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/globals.css">
-  <link rel="stylesheet" href="../css/login.css">
+  <link rel="stylesheet" href="../css/producto.css">
   
   <!-- Script para aplicar tema antes del render -->
   <script>
@@ -21,20 +25,33 @@
   </script>
 </head>
 <body>
+  <div class="product-page">
+    <div class="container">
+      <div class="product-loading" id="loading">
+        <div class="loading-spinner"></div>
+        <p style="color: var(--color-secundario);">Cargando producto...</p>
+      </div>
 
-
+      <div class="product-content" id="product-content" style="display: none;">
+        <!-- Contenido del producto se cargará aquí dinámicamente -->
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script type="module">
     import { ThemeBtn } from '../components/theme-btn.js';
     import { Header } from '../components/header.js';
+    import { Footer } from '../components/footer.js';
   
     ThemeBtn();
   
     const header = Header();
     document.body.insertBefore(header, document.body.firstChild);
-  </script>
-  <script src="../js/login.js"></script>
 
+    const footer = Footer();
+    document.body.appendChild(footer);
+  </script>
+  <script type="module" src="../js/producto.js"></script>
 </body>
 </html>

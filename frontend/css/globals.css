@@ -120,8 +120,9 @@ body.text-extra-large { --font-size-base: 20px; }
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background-color: var(--color-gris);
-  border: 2px solid var(--color-gris);
+  background-color: var(--color-texto);
+  color: var(--color-fondo);
+  border: 2px solid var(--color-fondo);
   border-radius: 50%;
   width: 50px;
   height: 50px;
@@ -135,6 +136,67 @@ body.text-extra-large { --font-size-base: 20px; }
 }
 
 .theme-toggle:hover {
-   opacity: 0.7;
+   opacity: 0.5;
    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   SWEETALERT2 - TEMA PERSONALIZADO
+   ============================================ */
+.swal2-popup {
+  background-color: var(--color-fondo) !important;
+  border: 2px solid var(--color-input-border) !important;
+  color: var(--color-texto) !important;
+}
+
+.swal2-title {
+  color: var(--color-texto) !important;
+}
+
+.swal2-html-container {
+  color: var(--color-secundario) !important;
+}
+
+.swal2-confirm {
+  background-color: var(--color-acento) !important;
+  border: none !important;
+}
+
+.swal2-confirm:hover {
+  background-color: #b00f0e !important;
+}
+
+.swal2-cancel {
+  background-color: var(--color-input-bg) !important;
+  color: var(--color-texto) !important;
+  border: 2px solid var(--color-input-border) !important;
+}
+
+.swal2-cancel:hover {
+  background-color: var(--color-input-border) !important;
+}
+
+/* Estilos para toasts (notificaciones pequeñas) */
+.swal2-toast {
+  background-color: var(--color-fondo) !important;
+  border: 2px solid var(--color-input-border) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.swal2-toast .swal2-title {
+  color: var(--color-texto) !important;
+  font-size: 1rem !important;
+}
+
+.swal2-toast .swal2-html-container {
+  color: var(--color-secundario) !important;
+  font-size: 0.9rem !important;
+}
+
+.swal2-toast .swal2-icon {
+  margin: 0 10px 0 0 !important;
+}
+
+.swal2-toast .swal2-timer-progress-bar {
+  background: var(--color-acento) !important;
 }

@@ -18,8 +18,10 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors({
-    origin: '*',
+    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], // Especificar orígenes permitidos
+    credentials: true, // Permitir credenciales (cookies, headers de autenticación)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200
 }));
 

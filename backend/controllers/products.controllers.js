@@ -38,7 +38,7 @@ exports.getProductById = async (req, res) => {
         
         // Obtener todas las imágenes del producto
         const [imagenes] = await pool.query(
-            'SELECT id, url FROM producto_imagenes WHERE producto_id = ?',
+            'SELECT id, url as url_imagen FROM producto_imagenes WHERE producto_id = ?',
             [id]
         );
         
@@ -49,13 +49,15 @@ exports.getProductById = async (req, res) => {
         
         res.json(producto);
     } catch (error) {
-        console.error("Error al obtener los productos:", error);
-        res.status(500).json({ message: "Error al obtener los productos" });
+        console.error("Error al obtener el producto:", error);
+        res.status(500).json({ message: "Error al obtener el producto" });
     }
 }
 
 exports.createProduct = async (req, res) => {
     const { nombre, descripcion, precio, stock, categoria, descuento } = req.body;
+    
+    // Validación de campos
     if (
         nombre === undefined ||
         descripcion === undefined ||

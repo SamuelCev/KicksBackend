@@ -2,7 +2,7 @@
 export function isAuthenticated() {
     // TODO: Implementar lógica de autenticación
     // Por ahora retorna false por defecto
-    return false;
+    return true;
 }
 
 // Proteger página
@@ -13,10 +13,11 @@ function protectPage() {
 }
 
 // Cerrar sesión 
-async function logoutUser() {
+export async function logout() {
     try {
-        // Intentar cerrar sesión en el backend
-        await peticionAPI('/logout', 'POST');
+        // TODO: Implementar llamada al backend
+        // await peticionAPI('/logout', 'POST');
+        console.log('Cerrando sesión...');
     } catch (error) {
         console.error('Error al cerrar sesión en el backend:', error);
     }

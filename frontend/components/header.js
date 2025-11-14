@@ -1,5 +1,5 @@
 import { cartIcon, userIcon, menuIcon, closeIcon } from '../js/utils/icons.js';
-import { isAuthenticated } from '../js/utils/auth.js';
+import { isAuthenticated, logout } from '../js/utils/auth.js';
 
 /**
  * Detecta la ruta base según la ubicación del archivo
@@ -24,12 +24,18 @@ export function Header() {
   const isLoggedIn = isAuthenticated();
   const basePath = getBasePath();
   
+  // Detectar tema actual
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  const logoSrc = currentTheme === 'dark' 
+    ? `${basePath}assets/img/kicks_logo_white.png` 
+    : `${basePath}assets/img/kicks_logo.png`;
+  
   header.innerHTML = `
     <nav class="navbar-container">
       <!-- Logo a la izquierda -->
       <div class="navbar-logo">
         <a href="${basePath}index.html">
-          <img src="${basePath}assets/img/kicks_logo.png" alt="KICKS Logo" class="logo-img">
+          <img src="${logoSrc}" alt="KICKS Logo" class="logo-img" id="navbar-logo">
         </a>
       </div>
       
@@ -38,14 +44,16 @@ export function Header() {
         <li><a href="${basePath}tienda/productos.html" class="nav-link">Productos</a></li>
         <li><a href="${basePath}tienda/nosotros.html" class="nav-link">Nosotros</a></li>
         <li><a href="${basePath}tienda/contacto.html" class="nav-link">Contacto</a></li>
+        <li><a href="${basePath}tienda/suscripcion.html" class="nav-link">Suscripcion</a></li>
+        <li><a href="${basePath}tienda/preguntas-frecuentes.html" class="nav-link">Preguntas Frecuentes</a></li>
       </ul>
       
       <!-- Acciones a la derecha -->
       <div class="navbar-actions">
         ${isLoggedIn ? `
-          <button class="navbar-icon-btn" aria-label="Carrito">
+          <a href="${basePath}tienda/carrito.html" class="navbar-icon-btn" aria-label="Carrito">
             ${cartIcon}
-          </button>
+          </a>
           <button class="navbar-icon-btn" aria-label="Cuenta">
             ${userIcon}
           </button>
@@ -74,12 +82,14 @@ export function Header() {
         <li><a href="${basePath}tienda/productos.html" class="mobile-nav-link">Productos</a></li>
         <li><a href="${basePath}tienda/nosotros.html" class="mobile-nav-link">Nosotros</a></li>
         <li><a href="${basePath}tienda/contacto.html" class="mobile-nav-link">Contacto</a></li>
+        <li><a href="${basePath}tienda/suscripcion.html" class="mobile-nav-link">Suscripcion</a></li>
+        <li><a href="${basePath}tienda/preguntas-frecuentes.html" class="mobile-nav-link">Preguntas Frecuentes</a></li>
         ${isLoggedIn ? `
           <li>
-            <button class="mobile-nav-link mobile-nav-icon" aria-label="Carrito">
+            <a href="${basePath}tienda/carrito.html" class="mobile-nav-link mobile-nav-icon" aria-label="Carrito">
               ${cartIcon}
               <span>Carrito</span>
-            </button>
+            </a>
           </li>
           <li>
             <button class="mobile-nav-link mobile-nav-icon" aria-label="Cuenta">
@@ -103,6 +113,14 @@ export function Header() {
   
   // Agregar funcionalidad del menú hamburguesa
   setupMobileMenu(header);
+  
+  // Agregar funcionalidad del menú de usuario
+  if (isLoggedIn) {
+    setupUserMenu(header);
+  }
+  
+  // Agregar listener para cambio de tema
+  setupThemeObserver(header, basePath);
   
   return header;
 }
@@ -216,6 +234,7 @@ function addHeaderStyles() {
       justify-content: center;
       border-radius: 8px;
       transition: all 0.3s ease;
+      text-decoration: none;
     }
     
     .navbar-icon-btn:hover {
@@ -380,6 +399,67 @@ function addHeaderStyles() {
         height: 40px;
       }
     }
+
+    /* Menú de usuario flotante */
+    .user-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background-color: var(--color-fondo);
+      border: 2px solid var(--color-input-border);
+      border-radius: 12px;
+      padding: 8px;
+      min-width: 200px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+
+    .user-menu.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .user-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: var(--color-texto);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .user-menu-item:hover {
+      background-color: var(--color-input-bg);
+      color: var(--color-acento);
+    }
+
+    .user-menu-item svg {
+      flex-shrink: 0;
+    }
+
+    .user-menu-divider {
+      height: 1px;
+      background-color: var(--color-input-border);
+      margin: 8px 0;
+    }
+
+    .navbar-actions {
+      position: relative;
+    }
   `;
   
   document.head.appendChild(style);
@@ -427,3 +507,141 @@ function setupMobileMenu(header) {
   });
 }
 
+/**
+ * Configura la funcionalidad del menú de usuario
+ */
+function setupUserMenu(header) {
+  // Crear el menú flotante
+  const userMenu = document.createElement('div');
+  userMenu.className = 'user-menu';
+  userMenu.innerHTML = `
+    <button class="user-menu-item" data-action="logout">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      <span>Cerrar sesión</span>
+    </button>
+  `;
+
+  // Encontrar el botón de usuario en desktop y móvil
+  const userBtnDesktop = header.querySelector('.navbar-actions .navbar-icon-btn[aria-label="Cuenta"]');
+  const userBtnMobile = header.querySelector('.mobile-nav-icon[aria-label="Cuenta"]');
+
+  // Agregar el menú al navbar-actions
+  const navbarActions = header.querySelector('.navbar-actions');
+  if (navbarActions) {
+    navbarActions.appendChild(userMenu);
+  }
+
+  // Toggle del menú en desktop
+  if (userBtnDesktop) {
+    userBtnDesktop.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userMenu.classList.toggle('active');
+    });
+  }
+
+  // Comportamiento en móvil (agregar opciones al menú móvil)
+  if (userBtnMobile) {
+    userBtnMobile.addEventListener('click', () => {
+      // Crear un menú temporal en móvil
+      const mobileUserOptions = document.createElement('div');
+      mobileUserOptions.className = 'mobile-user-options';
+      mobileUserOptions.innerHTML = userMenu.innerHTML;
+      
+      // Insertar después del botón de usuario en móvil
+      userBtnMobile.parentElement.insertAdjacentElement('afterend', mobileUserOptions);
+      
+      // Agregar event listeners a las opciones móviles
+      setupMenuActions(mobileUserOptions);
+    });
+  }
+
+  // Cerrar menú al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if (!userMenu.contains(e.target) && !userBtnDesktop?.contains(e.target)) {
+      userMenu.classList.remove('active');
+    }
+  });
+
+  // Event listeners para las acciones del menú
+  setupMenuActions(userMenu);
+}
+
+/**
+ * Configura los event listeners de las acciones del menú de usuario
+ */
+function setupMenuActions(menu) {
+  const menuItems = menu.querySelectorAll('.user-menu-item');
+  
+  menuItems.forEach(item => {
+    item.addEventListener('click', async (e) => {
+      const action = e.currentTarget.dataset.action;
+      
+      switch(action) {
+        case 'profile':
+          // TODO: Redirigir a perfil de usuario
+          console.log('Ir a perfil');
+          break;
+        case 'orders':
+          // TODO: Redirigir a pedidos
+          console.log('Ir a mis pedidos');
+          break;
+        case 'logout':
+          const result = await Swal.fire({
+            title: '¿Cerrar sesión?',
+            text: '¿Estás seguro de que deseas cerrar sesión?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, cerrar sesión',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            customClass: {
+              popup: 'swal2-popup',
+              title: 'swal2-title',
+              htmlContainer: 'swal2-html-container',
+              confirmButton: 'swal2-confirm',
+              cancelButton: 'swal2-cancel'
+            }
+          });
+          
+          if (result.isConfirmed) {
+            await logout();
+          }
+          break;
+      }
+    });
+  });
+}
+
+
+/**
+ * Configura el observador para cambios de tema
+ */
+function setupThemeObserver(header, basePath) {
+  const logo = header.querySelector('#navbar-logo');
+  
+  // Crear un observer para detectar cambios en el atributo data-theme
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newLogoSrc = currentTheme === 'dark' 
+          ? `${basePath}assets/img/kicks-logo-white.png` 
+          : `${basePath}assets/img/kicks_logo.png`;
+        
+        if (logo) {
+          logo.src = newLogoSrc;
+        }
+      }
+    });
+  });
+  
+  // Observar cambios en el atributo data-theme del elemento html
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme']
+  });
+}
