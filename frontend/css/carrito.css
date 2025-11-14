@@ -194,6 +194,14 @@
   font-size: 4rem;
   color: var(--color-input-border);
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.empty-cart-icon svg {
+  width: 80px;
+  height: 80px;
+  stroke-width: 1.5;
 }
 .empty-cart-text {
   font-size: 1.3rem;

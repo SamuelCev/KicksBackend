@@ -24,12 +24,18 @@ export function Header() {
   const isLoggedIn = isAuthenticated();
   const basePath = getBasePath();
   
+  // Detectar tema actual
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  const logoSrc = currentTheme === 'dark' 
+    ? `${basePath}assets/img/kicks_logo_white.png` 
+    : `${basePath}assets/img/kicks_logo.png`;
+  
   header.innerHTML = `
     <nav class="navbar-container">
       <!-- Logo a la izquierda -->
       <div class="navbar-logo">
         <a href="${basePath}index.html">
-          <img src="${basePath}assets/img/kicks_logo.png" alt="KICKS Logo" class="logo-img">
+          <img src="${logoSrc}" alt="KICKS Logo" class="logo-img" id="navbar-logo">
         </a>
       </div>
       
@@ -112,6 +118,9 @@ export function Header() {
   if (isLoggedIn) {
     setupUserMenu(header);
   }
+  
+  // Agregar listener para cambio de tema
+  setupThemeObserver(header, basePath);
   
   return header;
 }
@@ -607,3 +616,32 @@ function setupMenuActions(menu) {
   });
 }
 
+
+/**
+ * Configura el observador para cambios de tema
+ */
+function setupThemeObserver(header, basePath) {
+  const logo = header.querySelector('#navbar-logo');
+  
+  // Crear un observer para detectar cambios en el atributo data-theme
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newLogoSrc = currentTheme === 'dark' 
+          ? `${basePath}assets/img/kicks-logo-white.png` 
+          : `${basePath}assets/img/kicks_logo.png`;
+        
+        if (logo) {
+          logo.src = newLogoSrc;
+        }
+      }
+    });
+  });
+  
+  // Observar cambios en el atributo data-theme del elemento html
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme']
+  });
+}

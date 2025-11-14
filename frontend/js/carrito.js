@@ -1,4 +1,5 @@
 import { obtenerCarrito, actualizarCantidad, eliminarDelCarrito } from './api/carrito.js';
+import { cartIcon } from './utils/icons.js';
 
 const BACKEND_URL = 'http://localhost:3000';
 let carritoItems = [];
@@ -56,7 +57,9 @@ function mostrarCarritoVacio() {
     const container = document.getElementById('cart-content');
     container.innerHTML = `
         <div class="empty-cart">
-            <div class="empty-cart-icon">🛒</div>
+            <div class="empty-cart-icon" style="color: #d01110;">
+                ${cartIcon}
+            </div>
             <p class="empty-cart-text">Tu carrito está vacío</p>
             <a href="productos.html" class="continue-shopping">Continuar comprando</a>
         </div>

@@ -31,7 +31,7 @@ export function ProductCard(producto) {
   const imagenUrl = imagenCompleta || imagen;
   
   // Convertir precio y descuento a números (vienen como strings de MySQL)
-  const precioNum = parseFloat(precio);
+  const precioOriginal = parseFloat(precio);
   const descuentoNum = parseFloat(descuento);
   
   // El descuento viene como decimal (0.10 = 10%)
@@ -39,7 +39,7 @@ export function ProductCard(producto) {
   const discountPercent = tieneDescuento ? Math.round(descuentoNum * 100) : 0;
   
   // Calcular precio original si hay descuento
-  const precioOriginal = tieneDescuento ? precioNum / (1 - descuentoNum) : null;
+  const precioDescuento = tieneDescuento ? precioOriginal * (1 - descuentoNum) : null;
   
   const estaAgotado = stock === 0;
 
@@ -67,10 +67,10 @@ export function ProductCard(producto) {
         ${tieneDescuento ? `
           <div class="product-price-group">
             <span class="product-price-old">$${precioOriginal.toFixed(2)}</span>
-            <span class="product-price">$${precioNum.toFixed(2)}</span>
+            <span class="product-price">$${precioDescuento.toFixed(2)}</span>
           </div>
         ` : `
-          <span class="product-price">$${precioNum.toFixed(2)}</span>
+          <span class="product-price">$${precioOriginal.toFixed(2)}</span>
         `}
         <button 
           class="product-cart-btn ${estaAgotado ? 'product-cart-btn--disabled' : ''}" 

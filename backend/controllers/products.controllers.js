@@ -38,7 +38,7 @@ exports.getProductById = async (req, res) => {
         
         // Obtener todas las imágenes del producto
         const [imagenes] = await pool.query(
-            'SELECT id, url FROM producto_imagenes WHERE producto_id = ?',
+            'SELECT id, url as url_imagen FROM producto_imagenes WHERE producto_id = ?',
             [id]
         );
         
