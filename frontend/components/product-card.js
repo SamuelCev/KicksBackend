@@ -101,7 +101,9 @@ export function ProductCard(producto) {
   clickableElements.forEach(element => {
     element.style.cursor = 'pointer';
     element.addEventListener('click', () => {
-      window.location.href = `tienda/producto.html?id=${id}`;
+      // Usar ruta absoluta para que funcione desde cualquier ubicación
+      const basePath = window.location.pathname.includes('/tienda/') ? './' : 'tienda/';
+      window.location.href = `${basePath}producto.html?id=${id}`;
     });
   });
 
@@ -124,38 +126,25 @@ export function ProductCard(producto) {
  * @param {number} productPrice - Precio del producto
  * @param {string} productImage - URL de la imagen del producto
  */
-function addToCart(productId, productName, productPrice, productImage) {
-  // TODO: Implementar la lógica real del carrito
-  console.log('Agregar al carrito:', {
-    id: productId,
-    nombre: productName,
-    precio: productPrice,
-    imagen: productImage,
-    cantidad: 1
-  });
-
-  // Mostrar feedback visual temporal
-  const event = new CustomEvent('product-added-to-cart', {
-    detail: {
+async function addToCart(productId, productName, productPrice, productImage) {
+  try {
+    // Importar dinámicamente la función de API del carrito
+    const { agregarAlCarrito } = await import('../js/api/carrito.js');
+    
+    // Agregar al carrito (cantidad por defecto: 1)
+    await agregarAlCarrito(productId, 1, productName);
+    
+    console.log('Producto agregado al carrito:', {
       id: productId,
       nombre: productName,
       precio: productPrice,
-      imagen: productImage
-    }
-  });
-  window.dispatchEvent(event);
-
-  // Animación del botón (opcional)
-  const btn = event.target;
-  if (btn && btn.classList) {
-    btn.classList.add('product-cart-btn--added');
-    setTimeout(() => {
-      btn.classList.remove('product-cart-btn--added');
-    }, 1000);
+      imagen: productImage,
+      cantidad: 1
+    });
+    
+  } catch (error) {
+    console.error('Error al agregar producto al carrito:', error);
   }
-
-  // Placeholder para notificación (puedes implementar un toast/notification)
-  alert(`"${productName}" se agregó al carrito`);
 }
 
 /**

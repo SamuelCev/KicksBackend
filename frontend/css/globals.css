@@ -175,3 +175,28 @@ body.text-extra-large { --font-size-base: 20px; }
 .swal2-cancel:hover {
   background-color: var(--color-input-border) !important;
 }
+
+/* Estilos para toasts (notificaciones pequeñas) */
+.swal2-toast {
+  background-color: var(--color-fondo) !important;
+  border: 2px solid var(--color-input-border) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.swal2-toast .swal2-title {
+  color: var(--color-texto) !important;
+  font-size: 1rem !important;
+}
+
+.swal2-toast .swal2-html-container {
+  color: var(--color-secundario) !important;
+  font-size: 0.9rem !important;
+}
+
+.swal2-toast .swal2-icon {
+  margin: 0 10px 0 0 !important;
+}
+
+.swal2-toast .swal2-timer-progress-bar {
+  background: var(--color-acento) !important;
+}

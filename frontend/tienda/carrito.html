@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="../assets/img/favicon.ico" type="image/x-icon">
-  <title>Carrito - KICKS</title>
+  <title>Carrito de Compras - KICKS</title>
   
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -12,7 +12,7 @@
   
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/globals.css">
-  <link rel="stylesheet" href="../css/login.css">
+  <link rel="stylesheet" href="../css/carrito.css">
   
   <!-- Script para aplicar tema antes del render -->
   <script>
@@ -23,22 +23,39 @@
       document.documentElement.setAttribute("data-theme", theme);
     })();
   </script>
+    
 </head>
 <body>
+  <div class="cart-page">
+    <div class="container">
+      <div class="cart-header">
+        <h1 class="cart-title">Carrito de Compras</h1>
+        <p class="cart-subtitle">Revisa y gestiona tus productos</p>
+      </div>
 
-
+      <div class="cart-content" id="cart-content">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p style="color: var(--color-secundario);">Cargando carrito...</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script type="module">
     import { ThemeBtn } from '../components/theme-btn.js';
     import { Header } from '../components/header.js';
+    import { Footer } from '../components/footer.js';
   
     ThemeBtn();
   
     const header = Header();
     document.body.insertBefore(header, document.body.firstChild);
-  </script>
-  <script src="../js/login.js"></script>
 
+    const footer = Footer();
+    document.body.appendChild(footer);
+  </script>
+  <script type="module" src="../js/carrito.js"></script>
 </body>
 </html>

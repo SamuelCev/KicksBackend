@@ -30,7 +30,7 @@ exports.createOrder = async (req, res) => {
     try {
         // Calcular el subtotal del carrito
         const [cartItems] = await pool.query(
-            'SELECT ci.cantidad, p.precio, p.descuento, p.hasDescuento FROM carrito_items ci JOIN productos p ON ci.producto_id = p.id WHERE ci.usuario_id = ?',
+            'SELECT ci.producto_id, ci.cantidad, p.precio, p.descuento, p.hasDescuento FROM carrito_items ci JOIN productos p ON ci.producto_id = p.id WHERE ci.usuario_id = ?',
             [userId]
         );
 
@@ -75,12 +75,14 @@ exports.createOrder = async (req, res) => {
                 precioUnitario = precioUnitario - (precioUnitario * item.descuento);
             }
 
-            const [categoriaResult] = await pool.query('SELECT categoria FROM productos WHERE id = ?', [item.producto_id]);
+            // Obtener la categoría del producto
+            const [productoInfo] = await pool.query('SELECT categoria FROM productos WHERE id = ?', [item.producto_id]);
+            const categoria = productoInfo[0].categoria;
 
             await pool.query('UPDATE productos SET stock = stock - ? WHERE id = ?', [item.cantidad, item.producto_id]);
             await pool.query(
                 'INSERT INTO orden_items (orden_id, producto_id, cantidad, precio_unitario, categoria) VALUES (?, ?, ?, ?, ?)',
-                [orderId, item.producto_id, item.cantidad, precioUnitario, categoriaResult[0].categoria]
+                [orderId, item.producto_id, item.cantidad, precioUnitario, categoria]
             );
         }
         // Vaciar el carrito
