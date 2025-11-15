@@ -7,6 +7,7 @@ const ordenesRoutes = require("./routes/ordenes.routes");
 const suscripcionRoutes = require("./routes/suscripcion.routes");
 const contactRoutes = require("./routes/contact.routes");
 const authRoutes = require("./routes/auth.routes");
+const captchaRoutes = require("./routes/captcha.routes");
 
 dotenv.config();
 
@@ -23,8 +24,8 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], // Especificar orígenes permitidos
-    credentials: true, // Permitir credenciales (cookies, headers de autenticación)
+    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], 
+    credentials: true, 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200
@@ -37,6 +38,7 @@ app.use("/api/ordenes", ordenesRoutes);
 app.use("/api/suscripcion", suscripcionRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/captcha", captchaRoutes);
 
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`);
