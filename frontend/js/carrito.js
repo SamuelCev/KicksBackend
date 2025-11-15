@@ -1,5 +1,6 @@
 import { obtenerCarrito, actualizarCantidad, eliminarDelCarrito } from './api/carrito.js';
 import { cartIcon } from './utils/icons.js';
+import { getSwalConfig } from './utils/utilities.js';
 
 const BACKEND_URL = 'http://localhost:3000';
 let carritoItems = [];
@@ -8,27 +9,6 @@ let carritoItems = [];
  * Obtener URL completa de la imagen
  */
 function obtenerUrlImagen(imagenPath) {
-    if (!imagenPath) return null;
-    return `${BACKEND_URL}${imagenPath}`;
-}
-
-/**
- * Obtener configuración de SweetAlert según el tema actual
- */
-function getSwalConfig() {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    return {
-        background: isDark ? '#1a1a1a' : '#ffffff',
-        color: isDark ? '#e0e0e0' : '#333333',
-        confirmButtonColor: isDark ? '#4a9eff' : '#007bff',
-        cancelButtonColor: isDark ? '#6c757d' : '#6c757d'
-    };
-}
-
-/**
- * Cargar productos del carrito
- */
-async function cargarCarrito() {
     const container = document.getElementById('cart-content');
     
     try {

@@ -1,30 +1,20 @@
 import { API_URL } from './config.js';
+import { getSwalConfig } from '../utils/utilities.js';
 
 const BACKEND_URL = 'http://localhost:3000';
 
+//============================================
 // Variables globales
+//============================================
 let productosActuales = [];
 let productoEditando = null;
 let imagenesSeleccionadas = [];
 let imagenesExistentes = [];
 
-/**
- * Obtener configuración de SweetAlert según el tema actual
- */
-function getSwalConfig() {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    return {
-        background: isDark ? '#1a1a1a' : '#ffffff',
-        color: isDark ? '#e0e0e0' : '#333333',
-        confirmButtonColor: isDark ? '#4a9eff' : '#007bff',
-        cancelButtonColor: isDark ? '#6c757d' : '#6c757d',
-        iconColor: isDark ? '#4a9eff' : '#007bff'
-    };
-}
-
-/**
- * Mostrar alerta de éxito con SweetAlert
- */
+//============================================
+// Funciones auxiliares de UI
+//============================================
+// Mostrar alerta de éxito
 function mostrarAlertaExito(mensaje, titulo = '¡Éxito!') {
     Swal.fire({
         icon: 'success',
@@ -35,10 +25,7 @@ function mostrarAlertaExito(mensaje, titulo = '¡Éxito!') {
         showConfirmButton: false
     });
 }
-
-/**
- * Mostrar alerta de error con SweetAlert
- */
+// Mostrar alerta de error
 function mostrarAlertaError(mensaje, titulo = 'Error') {
     Swal.fire({
         icon: 'error',
@@ -48,10 +35,7 @@ function mostrarAlertaError(mensaje, titulo = 'Error') {
         confirmButtonText: 'Entendido'
     });
 }
-
-/**
- * Mostrar confirmación con SweetAlert
- */
+// Mostrar confirmación con opciones Sí/No
 async function mostrarConfirmacion(mensaje, titulo = '¿Estás seguro?') {
     const result = await Swal.fire({
         icon: 'warning',
@@ -64,32 +48,24 @@ async function mostrarConfirmacion(mensaje, titulo = '¿Estás seguro?') {
     });
     return result.isConfirmed;
 }
-
-/**
- * Obtener URL completa de la imagen
- */
+// Construir URL completa de imagen
 function obtenerUrlImagen(imagenPath) {
     if (!imagenPath) return null;
     return `${BACKEND_URL}${imagenPath}`;
 }
-
-/**
- * Mostrar mensaje de error
- */
+// Wrapper para mostrar error (simplifica llamadas)
 function mostrarError(mensaje) {
     mostrarAlertaError(mensaje);
 }
-
-/**
- * Mostrar mensaje de éxito
- */
+// Wrapper para mostrar éxito (simplifica llamadas)
 function mostrarExito(mensaje) {
     mostrarAlertaExito(mensaje);
 }
 
-/**
- * Cargar productos con filtros
- */
+//============================================
+// Gestión de productos
+//============================================
+// Cargar lista de productos desde el backend
 export async function cargarProductos() {
     const loadingDiv = document.getElementById('loading');
     const container = document.getElementById('products-container');
@@ -126,10 +102,7 @@ export async function cargarProductos() {
         loadingDiv.classList.remove('active');
     }
 }
-
-/**
- * Renderizar tabla de productos
- */
+// Renderizar tabla HTML con los productos
 function renderizarTablaProductos(productos) {
     const container = document.getElementById('products-container');
     
@@ -152,6 +125,7 @@ function renderizarTablaProductos(productos) {
                 <tr>
                     <th>Imagen</th>
                     <th>Nombre</th>
+                    <th>Marca</th>
                     <th>Categoría</th>
                     <th>Precio</th>
                     <th>Descuento</th>
@@ -170,6 +144,7 @@ function renderizarTablaProductos(productos) {
                             }
                         </td>
                         <td><strong>${producto.nombre}</strong></td>
+                        <td>${producto.marca || 'Sin marca'}</td>
                         <td>${producto.categoria}</td>
                         <td>$${parseFloat(producto.precio).toFixed(2)}</td>
                         <td>
@@ -204,9 +179,10 @@ function renderizarTablaProductos(productos) {
     container.innerHTML = tabla;
 }
 
-/**
- * Abrir modal para crear producto
- */
+//============================================
+// Gestión de modales
+//============================================
+// Abrir modal para crear un nuevo producto
 export function abrirModalCrear() {
     productoEditando = null;
     imagenesSeleccionadas = [];
@@ -222,10 +198,7 @@ export function abrirModalCrear() {
     
     document.getElementById('productModal').classList.add('active');
 }
-
-/**
- * Abrir modal para editar producto
- */
+// Abrir modal para editar un producto existente
 export async function abrirModalEditar(id) {
     const loadingDiv = document.getElementById('loading');
     loadingDiv.classList.add('active');
@@ -244,6 +217,7 @@ export async function abrirModalEditar(id) {
         // Llenar formulario
         document.getElementById('modal-title').textContent = 'Editar Producto';
         document.getElementById('product-id').value = productoEditando.id;
+        document.getElementById('marca').value = productoEditando.marca || '';
         document.getElementById('nombre').value = productoEditando.nombre;
         document.getElementById('descripcion').value = productoEditando.descripcion;
         document.getElementById('precio').value = productoEditando.precio;
@@ -272,10 +246,7 @@ export async function abrirModalEditar(id) {
         loadingDiv.classList.remove('active');
     }
 }
-
-/**
- * Renderizar imágenes existentes del producto
- */
+// Renderizar vista previa de imágenes ya subidas
 function renderizarImagenesExistentes() {
     const container = document.getElementById('existingImagesPreview');
     
@@ -289,9 +260,10 @@ function renderizarImagenesExistentes() {
     `).join('');
 }
 
-/**
- * Eliminar imagen existente del producto
- */
+//============================================
+// Gestión de imágenes
+//============================================
+// Eliminar una imagen existente del producto
 window.eliminarImagenExistente = async function(imageId) {
     const confirmado = await mostrarConfirmacion(
         'Esta acción no se puede deshacer',
@@ -326,10 +298,7 @@ window.eliminarImagenExistente = async function(imageId) {
         mostrarError('Error al eliminar la imagen');
     }
 };
-
-/**
- * Cerrar modal
- */
+// Cerrar modal y limpiar formulario
 export function cerrarModal() {
     document.getElementById('productModal').classList.remove('active');
     document.getElementById('productForm').reset();
@@ -340,10 +309,7 @@ export function cerrarModal() {
     imagenesExistentes = [];
     productoEditando = null;
 }
-
-/**
- * Manejar selección de imágenes
- */
+// Validar y seleccionar imágenes para subir
 export function seleccionarImagenes(event) {
     const files = Array.from(event.target.files);
     
@@ -371,10 +337,7 @@ export function seleccionarImagenes(event) {
     imagenesSeleccionadas = files;
     renderizarVistaPrevia();
 }
-
-/**
- * Renderizar vista previa de imágenes nuevas
- */
+// Mostrar vista previa de imágenes seleccionadas
 function renderizarVistaPrevia() {
     const container = document.getElementById('imagesPreview');
     
@@ -398,10 +361,7 @@ function renderizarVistaPrevia() {
         reader.readAsDataURL(file);
     });
 }
-
-/**
- * Remover imagen seleccionada
- */
+// Remover una imagen de la selección antes de enviar
 window.removerImagenSeleccionada = function(index) {
     const filesArray = Array.from(imagenesSeleccionadas);
     filesArray.splice(index, 1);
@@ -416,9 +376,10 @@ window.removerImagenSeleccionada = function(index) {
     renderizarVistaPrevia();
 };
 
-/**
- * Enviar formulario (crear o actualizar)
- */
+//============================================
+// Gestión de formulario
+//============================================
+// Enviar formulario de crear/editar producto
 export async function enviarFormulario(event) {
     event.preventDefault();
     
@@ -447,10 +408,7 @@ export async function enviarFormulario(event) {
         submitBtn.textContent = isEditing ? 'Actualizar Producto' : 'Crear Producto';
     }
 }
-
-/**
- * Crear nuevo producto
- */
+// Crear un nuevo producto en el backend
 async function crearProducto() {
     const formData = new FormData();
     
@@ -460,6 +418,7 @@ async function crearProducto() {
     formData.append('stock', document.getElementById('stock').value);
     formData.append('categoria', document.getElementById('categoria').value);
     formData.append('descuento', document.getElementById('descuento').value);
+    formData.append('marca', document.getElementById('marca').value);
     
     // Agregar imágenes
     imagenesSeleccionadas.forEach((file) => {
@@ -478,13 +437,11 @@ async function crearProducto() {
     
     return await response.json();
 }
-
-/**
- * Actualizar producto existente
- */
+// Actualizar datos de un producto existente
 async function actualizarProducto(productId) {
     // 1. Actualizar datos del producto (sin imágenes)
     const data = {
+        marca: document.getElementById('marca').value,
         nombre: document.getElementById('nombre').value,
         descripcion: document.getElementById('descripcion').value,
         precio: parseFloat(document.getElementById('precio').value),
@@ -513,10 +470,7 @@ async function actualizarProducto(productId) {
     
     return await response.json();
 }
-
-/**
- * Agregar imágenes a producto existente
- */
+// Agregar nuevas imágenes a un producto existente
 async function agregarImagenesAProducto(productId) {
     const formData = new FormData();
     
@@ -536,10 +490,7 @@ async function agregarImagenesAProducto(productId) {
     
     return await response.json();
 }
-
-/**
- * Eliminar producto (soft delete)
- */
+// Eliminar un producto (soft delete)
 export async function eliminarProducto(id, nombre) {
     const confirmado = await mostrarConfirmacion(
         `El producto "${nombre}" será eliminado. Esta acción no se puede deshacer.`,
