@@ -250,3 +250,20 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ message: "Error al cambiar contraseña" });
     }
 };
+
+// Logout de usuario
+exports.logout = (req, res) => {
+    try {
+        // Eliminar la cookie del token
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax'
+        });
+        
+        res.json({ message: "Logout exitoso" });
+    } catch (error) {
+        console.error("Error al hacer logout:", error);
+        res.status(500).json({ message: "Error al hacer logout" });
+    }
+};
