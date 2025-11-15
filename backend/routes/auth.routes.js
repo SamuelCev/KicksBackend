@@ -7,6 +7,7 @@ const usuarioController = require('../controllers/auth.controllers');
 // Rutas públicas 
 router.post('/register', usuarioController.register);
 router.post('/login', usuarioController.login);
+router.post('/logout', usuarioController.logout);
 // Rutas protegidas 
 router.get('/perfil', loginRequired, usuarioController.getProfile);
 router.put('/perfil', loginRequired, usuarioController.updateProfile);
