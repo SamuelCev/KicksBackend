@@ -1,3 +1,6 @@
+import { aiChatIcon, trashIcon } from './utils/icons.js';
+import './utils/chat.js';
+
 // ============================================
 // CARGAR PRODUCTOS DESTACADOS DESDE EL BACKEND
 // ============================================
@@ -30,6 +33,10 @@ async function loadFeaturedProducts() {
 // FUNCIONALIDAD DEL CAROUSEL
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('chatFabIcon').innerHTML = aiChatIcon;
+    document.getElementById('chatHeaderIcon').innerHTML = aiChatIcon;
+    document.getElementById('clearChat').innerHTML = trashIcon;
+
     // Cargar productos destacados
     loadFeaturedProducts();
     

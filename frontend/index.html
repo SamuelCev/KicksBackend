@@ -9,6 +9,7 @@
   <!-- Estilos -->
   <link rel="stylesheet" href="css/globals.css">
   <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/chat.css">
   
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -248,6 +249,52 @@
     </div>
   </section>
 
+  <!-- Botón flotante para abrir el chat -->
+  <button class="chat-fab" id="chatFab">
+      <span class="chat-fab-icon" id="chatFabIcon"></span>
+  </button>
+
+  <!-- Modal del chat -->
+  <div class="chat-modal" id="chatModal">
+      <div class="chat-container">
+          
+          <!-- Header del chat -->
+          <div class="chat-header">
+              <div class="chat-header-info">
+                  <span class="chat-icon" id="chatHeaderIcon"></span>
+                  <h3>Asistente IA</h3>
+              </div>
+              <div class="chat-header-actions">
+                  <button class="btn-icon" id="clearChat" title="Limpiar conversación">
+                      <span id="clearChat"></span>
+                  </button>
+                  <button class="btn-icon" id="closeChat" title="Cerrar">
+                      ✕
+                  </button>
+              </div>
+          </div>
+
+          <div class="chat-messages" id="chatMessages"></div>
+
+          <div class="chat-input-container">
+              <form id="chatForm" class="chat-form">
+                  <input 
+                      type="text" 
+                      id="messageInput" 
+                      class="chat-input" 
+                      placeholder="Escribe tu mensaje..."
+                      autocomplete="off"
+                      required
+                  >
+                  <button type="submit" class="chat-send-btn">
+                      ➤
+                  </button>
+              </form>
+          </div>
+
+      </div>
+  </div>
+
   <!-- Scripts -->
   <script type="module">
     import { ThemeBtn } from './components/theme-btn.js';
@@ -262,7 +309,7 @@
     document.body.insertBefore(header, document.body.firstChild);
     document.body.appendChild(footer);;
   </script>
-  <script src="js/index.js"></script>
+  <script type="module" src="js/index.js"></script>
 
 </body>
 </html>

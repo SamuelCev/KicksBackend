@@ -43,7 +43,12 @@ export const API_ENDPOINTS = {
     GENERATE: '/captcha/generate',
     VALIDATE: '/captcha/validate',
   },
-  
+
+  // Asistente Inteligente
+  AI: {
+    ASSISTANT: '/ai/chat',
+  },
+
   // Otros
   SUSCRIPCION: '/suscripcion',
   CONTACT: '/contact',

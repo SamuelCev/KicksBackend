@@ -4,11 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="../assets/img/favicon.ico" type="image/x-icon">
-  <title>Recuperar - KICKS</title>
+  <title>Registro - KICKS</title>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/globals.css">
-  <link rel="stylesheet" href="../css/login.css">
+  <link rel="stylesheet" href="../css/registro.css">
   
   <!-- Script para aplicar tema antes del render -->
   <script>
@@ -23,7 +27,6 @@
 <body>
 
 
-
   <!-- Scripts -->
   <script type="module">
     import { ThemeBtn } from '../components/theme-btn.js';
@@ -31,10 +34,11 @@
   
     ThemeBtn();
   
-    const header = Header();
+    const header = await Header();
     document.body.insertBefore(header, document.body.firstChild);
   </script>
-  <script src="../js/login.js"></script>
+  <script type="module" src="../js/registro.js"></script>
 
 </body>
 </html>
+

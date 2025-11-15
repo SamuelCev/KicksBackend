@@ -869,6 +869,23 @@ export async function enviarContacto(email) {
 }
 
 //============================================
+// Asistente Inteligente
+//============================================
+export async function inferenceAIAssistant(messages) {
+    try {
+        const response = await peticionAPI(
+            API_ENDPOINTS.AI.ASSISTANT,
+            'POST',
+            { messages }
+        );
+        return response;
+    } catch (error) {
+        console.error('Error en inferenceAIAssistant:', error);
+        return { ok: false, error: 'Error de conexión con el servidor' };
+    }
+}
+
+//============================================
 // Funciones auxiliares
 //============================================
 // Hacer petición al backend
