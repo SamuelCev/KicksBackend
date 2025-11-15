@@ -17,11 +17,11 @@ function getBasePath() {
 /**
  * Crea y renderiza el navbar
  */
-export function Header() {
+export async function Header() {
   const header = document.createElement('header');
   header.className = 'navbar';
   
-  const isLoggedIn = isAuthenticated();
+  const isLoggedIn = await isAuthenticated();
   const basePath = getBasePath();
   
   // Detectar tema actual

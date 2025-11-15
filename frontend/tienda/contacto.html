@@ -165,10 +165,10 @@
   
     ThemeBtn();
   
-    const header = Header();
-    document.body.insertBefore(header, document.body.firstChild);
-
+    const header = await Header();
     const footer = Footer();
+    
+    document.body.insertBefore(header, document.body.firstChild);
     document.body.appendChild(footer);
   </script>
   <script type="module" src="../js/contacto.js"></script>

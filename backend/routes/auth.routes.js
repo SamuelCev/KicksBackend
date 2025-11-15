@@ -11,6 +11,6 @@ router.post('/logout', usuarioController.logout);
 // Rutas protegidas 
 router.get('/perfil', loginRequired, usuarioController.getProfile);
 router.put('/perfil', loginRequired, usuarioController.updateProfile);
-router.put('/cambiar-contraseña', loginRequired, usuarioController.changePassword);
+router.put('/cambiar-contrasena', loginRequired, usuarioController.changePassword);
 
 module.exports = router;

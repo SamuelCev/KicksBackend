@@ -256,12 +256,12 @@
     import { Footer } from './components/footer.js';
   
     ThemeBtn();
-  
-    const header = Header();
-    document.body.insertBefore(header, document.body.firstChild);
     
+    const header = await Header();
     const footer = Footer();
-    document.body.appendChild(footer);
+    
+    document.body.insertBefore(header, document.body.firstChild);
+    document.body.appendChild(footer);;
   </script>
   <script src="js/index.js"></script>
 

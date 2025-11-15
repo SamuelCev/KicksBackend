@@ -106,9 +106,11 @@
   
     ThemeBtn();
   
-    const header = Header();
-    document.body.insertBefore(header, document.body.firstChild);
-
+    (async () => {
+      const header = await Header();
+      document.body.insertBefore(header, document.body.firstChild);
+    })();
+    
     const footer = Footer();
     document.body.appendChild(footer);
   </script>

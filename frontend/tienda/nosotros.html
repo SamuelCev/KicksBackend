@@ -28,13 +28,16 @@
   <script type="module">
     import { ThemeBtn } from '../components/theme-btn.js';
     import { Header } from '../components/header.js';
+    import { Footer } from '../components/footer.js';
   
     ThemeBtn();
   
-    const header = Header();
+    const header = await Header();
+    const footer = Footer();
+    
     document.body.insertBefore(header, document.body.firstChild);
+    document.body.appendChild(footer);
   </script>
-  <script src="../js/login.js"></script>
 
 </body>
 </html>
