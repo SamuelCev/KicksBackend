@@ -32,12 +32,45 @@ async function cargarProductos() {
     todosLosProductos = await obtenerProductos();
     productosFiltrados = [...todosLosProductos];
 
-    // Verificar si hay parámetros de categoría en la URL
+    // Verificar si hay parámetros en la URL
     const urlParams = new URLSearchParams(window.location.search);
     const categoriaParam = urlParams.get('categoria');
+    const descuentoParam = urlParams.get('descuento');
+
+    // Validar categoría
+    const categoriasValidas = ['running', 'senderismo', 'basketball'];
     
     if (categoriaParam) {
-      categoryFilter.value = categoriaParam.toLowerCase();
+      const categoriaLower = categoriaParam.toLowerCase();
+      
+      if (categoriasValidas.includes(categoriaLower)) {
+        // Categoría válida, aplicarla
+        categoryFilter.value = categoriaLower;
+      } else {
+        // Categoría inválida, eliminar de la URL
+        urlParams.delete('categoria');
+        
+        // Actualizar la URL sin recargar la página
+        const nuevaUrl = urlParams.toString() 
+          ? `${window.location.pathname}?${urlParams.toString()}`
+          : window.location.pathname;
+        
+        window.history.replaceState({}, '', nuevaUrl);
+      }
+    }
+
+    // Si hay parámetro de descuento, aplicarlo
+    if (descuentoParam === 'true') {
+      discountFilter.value = 'true';
+    } else {
+        urlParams.delete('descuento');
+        
+        // Actualizar la URL sin recargar la página
+        const nuevaUrl = urlParams.toString() 
+          ? `${window.location.pathname}?${urlParams.toString()}`
+          : window.location.pathname;
+        
+        window.history.replaceState({}, '', nuevaUrl);
     }
 
     // Aplicar filtros y renderizar
