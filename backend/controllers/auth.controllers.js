@@ -154,7 +154,12 @@ exports.login = async (req, res) => {
         );
 
         if (users.length === 0) {
-            return res.status(401).json({ message: "Credenciales inválidas" });
+            const attemptData=recordFailedLoginAttempt(email);
+            const remainingAttempts=MAX_ATTEMPTS-attemptData.attempts;
+            return res.status(401).json({ 
+                message: "Credenciales inválidas", 
+                remainingAttempts:remainingAttempts>0?remainingAttempts:0
+            });
         }
 
         const user = users[0];
@@ -167,8 +172,16 @@ exports.login = async (req, res) => {
         // Verificar contraseña
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: "Credenciales inválidas" });
+            const attemptData=recordFailedLoginAttempt(email);
+            const remainingAttempts=MAX_ATTEMPTS-attemptData.attempts;
+
+            return res.status(401).json({ message: "Credenciales inválidas",
+                remainingAttempts:remainingAttempts>0?remainingAttempts:0
+            });
         }
+
+        //Login exitoso, limpiar intentos
+        clearLoginAttempts(email);
 
         // Generar token JWT
         const token = jwt.sign(
