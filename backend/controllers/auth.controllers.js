@@ -40,6 +40,28 @@ const isAccountLocked=(email)=>{
 
 };
 
+//Registrar intento fallido
+const recordFailedLoginAttempt=(email)=>{
+    const attemptData=loginAttempts.get(email)||{attempts:0};
+    attemptData.attempts+=1;
+
+    if(attemptData.attempts>=MAX_ATTEMPTS){
+        attemptData.lockedUntil=Date.now()+LOCKOUT_TIME;
+        attemptData.attempts=0; //reiniciar intentos después de bloqueo
+    }
+
+    loginAttempts.set(email,attemptData);
+    return attemptData;
+};
+
+//Limpiar intentos después de un login exitoso
+const clearLoginAttempts=(email)=>{
+    loginAttempts.delete(email);
+};
+
+
+
+
 // Registro de nuevo usuario
 exports.register = async (req, res) => {
     const { nombre, email, password } = req.body;
