@@ -55,7 +55,7 @@ exports.getProductById = async (req, res) => {
 }
 
 exports.createProduct = async (req, res) => {
-    const { nombre, descripcion, precio, stock, categoria, descuento } = req.body;
+    const { nombre, descripcion, precio, stock, categoria, descuento, marca } = req.body;
     
     // Validación de campos
     if (
@@ -64,9 +64,10 @@ exports.createProduct = async (req, res) => {
         precio === undefined ||
         stock === undefined ||
         categoria === undefined ||
-        descuento === undefined
+        descuento === undefined ||
+        marca === undefined
     ) {
-        return res.status(400).json({ message: "Todos los campos son obligatorios: nombre, descripcion, precio, stock, categoria, descuento" });
+        return res.status(400).json({ message: "Todos los campos son obligatorios: nombre, descripcion, precio, stock, categoria, descuento, marca" });
     }
 
     if (categoria !== 'senderismo' && categoria !== 'basketball' && categoria !== 'running') {
@@ -80,8 +81,8 @@ exports.createProduct = async (req, res) => {
         
         // Crear el producto
         const [result] = await connection.query(
-            'INSERT INTO productos (nombre, descripcion, precio, stock, categoria, descuento, hasDescuento) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [nombre, descripcion, precio, stock, categoria, descuento, descuento > 0 ? 1 : 0]
+            'INSERT INTO productos (nombre, descripcion, precio, stock, categoria, descuento, hasDescuento, marca) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [nombre, descripcion, precio, stock, categoria, descuento, descuento > 0 ? 1 : 0, marca]
         );
         
         const productoId = result.insertId;
@@ -124,7 +125,7 @@ exports.createProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     const { id } = req.params;
-    const { nombre, descripcion, precio, stock, categoria, descuento } = req.body;
+    const { nombre, descripcion, precio, stock, categoria, descuento, marca } = req.body;
 
     if (
         nombre === undefined ||
@@ -132,9 +133,10 @@ exports.updateProduct = async (req, res) => {
         precio === undefined ||
         stock === undefined ||
         categoria === undefined ||
-        descuento === undefined
+        descuento === undefined ||
+        marca === undefined
     ) {
-        return res.status(400).json({ message: "Todos los campos son obligatorios: nombre, descripcion, precio, stock, categoria, descuento" });
+        return res.status(400).json({ message: "Todos los campos son obligatorios: nombre, descripcion, precio, stock, categoria, descuento, marca" });
     }
 
     if (categoria !== 'senderismo' && categoria !== 'basketball' && categoria !== 'running') {
@@ -143,8 +145,8 @@ exports.updateProduct = async (req, res) => {
 
     try {
         const [result] = await pool.query(
-            'UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ?, categoria = ?, descuento = ?, hasDescuento = ? WHERE id = ? AND estado = 1',
-            [nombre, descripcion, precio, stock, categoria, descuento, descuento > 0 ? 1 : 0, id]
+            'UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ?, categoria = ?, descuento = ?, hasDescuento = ?, marca = ? WHERE id = ? AND estado = 1',
+            [nombre, descripcion, precio, stock, categoria, descuento, descuento > 0 ? 1 : 0, marca, id]
         );
 
         if (result.affectedRows === 0) {

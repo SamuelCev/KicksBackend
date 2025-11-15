@@ -1,8 +1,10 @@
 const { pool } = require('../services/dbConnection');
+const { sendMailWithPdf } = require('../services/emailSender');
 
 exports.createOrder = async (req, res) => {
     //const userId  = req.userId;
     const userId = 1; // Temporalmente fijo para pruebas
+    const userEmail = req.userEmail;
 
     const { metodo_pago, nombre_envio, direccion_envio, ciudad, codigo_postal, telefono, pais, cupon, datos_pago } = req.body;
 
@@ -26,6 +28,7 @@ exports.createOrder = async (req, res) => {
     let impuesto = 0;
     let gasto_envio = 0;
     let total = 0;
+    let text = '';
 
     try {
         // Calcular el subtotal del carrito
@@ -76,7 +79,7 @@ exports.createOrder = async (req, res) => {
             }
 
             // Obtener la categoría del producto
-            const [productoInfo] = await pool.query('SELECT categoria FROM productos WHERE id = ?', [item.producto_id]);
+            const [productoInfo] = await pool.query('SELECT nombre, categoria FROM productos WHERE id = ?', [item.producto_id]);
             const categoria = productoInfo[0].categoria;
 
             await pool.query('UPDATE productos SET stock = stock - ? WHERE id = ?', [item.cantidad, item.producto_id]);
@@ -84,12 +87,44 @@ exports.createOrder = async (req, res) => {
                 'INSERT INTO orden_items (orden_id, producto_id, cantidad, precio_unitario, categoria) VALUES (?, ?, ?, ?, ?)',
                 [orderId, item.producto_id, item.cantidad, precioUnitario, categoria]
             );
+
+            text += `<li><strong>${item.cantidad}x</strong> ${productoInfo[0].nombre} - <strong>$${precioUnitario}</strong></li>`;
         }
         // Vaciar el carrito
         await pool.query(
             'DELETE FROM carrito_items WHERE usuario_id = ?',
             [userId]
         );
+
+        await sendMailWithPdf({
+            to: userEmail,
+            subject: 'Confirmación de tu orden en KICKS',
+            text: `
+                <h3>¡Gracias por tu compra!</h3>
+                <p>Tu orden ha sido procesada exitosamente. A continuación los detalles:</p>
+                <h4>Productos:</h4>
+                <ul>
+                    ${text}
+                </ul>
+                <hr>
+                <p><strong>Subtotal:</strong> $${subtotal.toFixed(2)}</p>
+                <p><strong>Impuestos:</strong> $${impuesto.toFixed(2)}</p>
+                <p><strong>Gastos de envío:</strong> $${gasto_envio.toFixed(2)}</p>
+                ${cupon ? `<p style="color: #10b981;"><strong>Cupón aplicado (${cupon}):</strong> -10%</p>` : ''}
+                <h3 style="color: #D01110;">Total: $${total.toFixed(2)}</h3>
+                <hr>
+                <p><strong>Dirección de envío:</strong><br>
+                ${nombre_envio}<br>
+                ${direccion_envio}<br>
+                ${ciudad}, ${codigo_postal}<br>
+                ${pais.toUpperCase()}<br>
+                Tel: ${telefono}</p>
+                <p>Recibirás tu pedido en un plazo de 5-7 días hábiles.</p>
+            `,
+            pdfPath: null,
+            pdfName: null
+        });
+
         res.status(201).json({ message: "Orden creada exitosamente", orderId });
     } catch (error) {
         console.error("Error al crear la orden:", error);

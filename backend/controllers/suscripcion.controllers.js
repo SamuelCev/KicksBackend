@@ -10,7 +10,7 @@ exports.subscribeUser = async (req, res) => {
         pdfPath: null,
         pdfName: null
     }).then(info => {
-        res.status(200).json({ message: 'Correo de suscripción enviado exitosamente', info });
+        res.status(200).json({ message: 'Correo de suscripción enviado exitosamente'});
     }).catch(error => {
         console.error('Error al enviar el correo de suscripción:', error);
         res.status(500).json({ message: 'Error al enviar el correo de suscripción' });

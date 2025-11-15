@@ -11,19 +11,20 @@ const {
     getStockByCategory
 } = require('../controllers/products.controllers');
 const upload = require('../middleware/uploadImages');
+const { loginRequired } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
 router.get('/', getAllProducts);
-router.post('/', upload.array('imagenes', 20), createProduct); // Permite hasta 20 imágenes
+router.post('/', loginRequired, upload.array('imagenes', 20), createProduct); // Permite hasta 20 imágenes
 router.get('/randoms', productosAleatorios);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
-router.get('/stock/categoria/:categoria', getStockByCategory);
+router.put('/:id', loginRequired, updateProduct);
+router.delete('/:id', loginRequired, deleteProduct);
+router.get('/stock/categoria/:categoria', loginRequired, getStockByCategory);
 router.get('/:id', getProductById);
 
 // Gestión de imágenes
-router.post('/:id/imagenes', upload.array('imagenes', 5), addProductImages); // Agregar imágenes
-router.delete('/:id/imagenes/:imageId', deleteProductImage); // Eliminar una imagen
+router.post('/:id/imagenes', loginRequired, upload.array('imagenes', 5), addProductImages); // Agregar imágenes
+router.delete('/:id/imagenes/:imageId', loginRequired, deleteProductImage); // Eliminar una imagen
 
 module.exports = router;

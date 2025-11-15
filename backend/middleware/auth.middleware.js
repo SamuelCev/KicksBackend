@@ -1,22 +1,18 @@
 const jwt = require("jsonwebtoken");
 
-module.exports = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+exports.loginRequired = (req, res, next) => {
 
-  if (!authHeader) {
-    return res.status(401).json({ error: "No autorizado. Falta el token." });
-  }
-
-  const token = authHeader.split(" ")[1];
+  // Extraer el token de la cookie httpOnly llamada 'token'
+  const token = req.cookies && req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ error: "Token inválido o faltante." });
+    return res.status(401).json({ error: "No autorizado. Falta el token." });
   }
 
   try {
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || "tu_clave_secreta_muy_segura"
+      process.env.JWT_SECRET || "ioufrwenfcierowcnoewnrcuiewqoty4370829147"
     );
 
     // Tu token contiene: { userId, email, rol }

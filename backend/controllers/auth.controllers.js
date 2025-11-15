@@ -48,20 +48,8 @@ exports.register = async (req, res) => {
             [nombre, email, hashedPassword, 0, 1] // rol 0 = usuario normal, status 1 = activo
         );
 
-        // Generar token JWT
-        const token = jwt.sign(
-            { 
-                userId: result.insertId, 
-                email: email,
-                rol: 0 
-            },
-            process.env.JWT_SECRET || 'tu_clave_secreta_muy_segura',
-            { expiresIn: '24h' }
-        );
-
         res.status(201).json({
             message: "Usuario registrado exitosamente",
-            token,
             user: {
                 id: result.insertId,
                 nombre,
@@ -117,17 +105,22 @@ exports.login = async (req, res) => {
                 email: user.email,
                 rol: user.rol 
             },
-            process.env.JWT_SECRET || 'tu_clave_secreta_muy_segura',
+            process.env.JWT_SECRET || 'ioufrwenfcierowcnoewnrcuiewqoty4370829147',
             { expiresIn: '24h' }
         );
 
+        // Enviar el token como cookie httpOnly
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 1000 // 1 hora
+        });
         res.json({
             message: "Login exitoso",
-            token,
             user: {
                 id: user.id,
                 nombre: user.nombre,
-                email: user.email,
                 rol: user.rol
             }
         });
