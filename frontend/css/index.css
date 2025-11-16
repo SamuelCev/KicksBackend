@@ -442,10 +442,6 @@
   width: fit-content;
 }
 
-.brands-carousel:hover {
-  animation-play-state: paused;
-}
-
 @keyframes scrollBrands {
   0% {
     transform: translateX(0);

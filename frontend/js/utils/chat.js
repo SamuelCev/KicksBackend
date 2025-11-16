@@ -63,6 +63,21 @@ function loadChatHistory() {
         
         // Scroll al final
         scrollToBottom();
+    } else {
+        // Si no hay historial, crear mensaje de bienvenida
+        const welcomeMessage = {
+            role: 'assistant',
+            content: '¡Hola! Soy Kicksy tu asistente personal de Kicks. ¿En qué puedo ayudarte hoy?'
+        };
+        
+        // Agregar al historial
+        conversationHistory.push(welcomeMessage);
+        
+        // Guardar en localStorage
+        saveChatHistory();
+        
+        // Mostrar en la UI
+        addMessageToUI(welcomeMessage.content, 'ai', false);
     }
 }
 
