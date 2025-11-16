@@ -1,5 +1,6 @@
 const { pool } = require('../services/dbConnection');
 const { sendMailWithPdf } = require('../services/emailSender');
+const { generarReciboPDF } = require('../services/generadorRecibos');
 
 exports.createOrder = async (req, res) => {
     //const userId  = req.userId;
@@ -96,33 +97,28 @@ exports.createOrder = async (req, res) => {
             [userId]
         );
 
+        const pdfPath = await generarReciboPDF({
+            orderId,
+            userId,
+            cartItems,
+            subtotal,
+            impuesto,
+            gasto_envio,
+            total,
+            cupon,
+            nombre_envio,
+            direccion_envio,
+            ciudad,
+            codigo_postal,
+            pais,
+            telefono
+        });
+
         await sendMailWithPdf({
             to: userEmail,
             subject: 'Confirmación de tu orden en KICKS',
-            text: `
-                <h3>¡Gracias por tu compra!</h3>
-                <p>Tu orden ha sido procesada exitosamente. A continuación los detalles:</p>
-                <h4>Productos:</h4>
-                <ul>
-                    ${text}
-                </ul>
-                <hr>
-                <p><strong>Subtotal:</strong> $${subtotal.toFixed(2)}</p>
-                <p><strong>Impuestos:</strong> $${impuesto.toFixed(2)}</p>
-                <p><strong>Gastos de envío:</strong> $${gasto_envio.toFixed(2)}</p>
-                ${cupon ? `<p style="color: #10b981;"><strong>Cupón aplicado (${cupon}):</strong> -10%</p>` : ''}
-                <h3 style="color: #D01110;">Total: $${total.toFixed(2)}</h3>
-                <hr>
-                <p><strong>Dirección de envío:</strong><br>
-                ${nombre_envio}<br>
-                ${direccion_envio}<br>
-                ${ciudad}, ${codigo_postal}<br>
-                ${pais.toUpperCase()}<br>
-                Tel: ${telefono}</p>
-                <p>Recibirás tu pedido en un plazo de 5-7 días hábiles.</p>
-            `,
-            pdfPath: null,
-            pdfName: null
+            pdfPath: pdfPath,
+            pdfName: `Recibo_Orden_${orderId}.pdf`
         });
 
         res.status(201).json({ message: "Orden creada exitosamente", orderId });
