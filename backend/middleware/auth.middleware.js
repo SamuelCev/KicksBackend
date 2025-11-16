@@ -26,3 +26,10 @@ exports.loginRequired = (req, res, next) => {
     return res.status(401).json({ error: "Token no válido o expirado." });
   }
 };
+
+exports.adminRequired = (req, res, next) => {
+  if (req.userRol !== 1) {
+    return res.status(403).json({ error: "Acceso denegado. Se requiere rol de administrador." });
+  }
+  next();
+};
