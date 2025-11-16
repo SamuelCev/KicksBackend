@@ -2,6 +2,66 @@ const { pool } = require('../services/dbConnection');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const loginAttempts=new Map();
+
+const MAX_ATTEMPTS=5;
+const LOCKOUT_TIME=5*60*1000;//5minutos (en milisegundos)
+
+//Funcion para limpiar intentos antiguos periódicamente
+setInterval(()=>{
+    const now=Date.now();
+    for(const [email,data]of loginAttempts){
+        if(attemptData.lockedUntil&&now>attemptData.lockedUntil){
+            loginAttempts.delete(email);
+        }
+    }
+},60000);//limpiar cada minuto
+
+//Función para verificar si una cuenta está bloqueada
+const isAccountLocked=(email)=>{
+    const attemptData=loginAttempts.get(email);
+    if(!attemptData)return false;
+
+    const now=Date.now();
+    if(attemptData.lockedUntil&&now<attemptData.lockedUntil){
+        return{
+            locked:true,
+            remainingTime:Math.ceil((attemptData.lockedUntil-now)/1000)
+        };
+    }
+
+    //Si el tempo de bloqueo ha pasado, reiniciar los intentos
+    if(attemptData.lockedUntil&&now>=attemptData.lockedUntil){
+        loginAttempts.delete(email);
+        return false;
+    }
+
+    return false;
+
+};
+
+//Registrar intento fallido
+const recordFailedLoginAttempt=(email)=>{
+    const attemptData=loginAttempts.get(email)||{attempts:0};
+    attemptData.attempts+=1;
+
+    if(attemptData.attempts>=MAX_ATTEMPTS){
+        attemptData.lockedUntil=Date.now()+LOCKOUT_TIME;
+        attemptData.attempts=0; //reiniciar intentos después de bloqueo
+    }
+
+    loginAttempts.set(email,attemptData);
+    return attemptData;
+};
+
+//Limpiar intentos después de un login exitoso
+const clearLoginAttempts=(email)=>{
+    loginAttempts.delete(email);
+};
+
+
+
+
 // Registro de nuevo usuario
 exports.register = async (req, res) => {
     const { nombre, email, password } = req.body;
@@ -74,6 +134,18 @@ exports.login = async (req, res) => {
         });
     }
 
+    //Verificacion si la cuenta está bloqueada
+    const lockStatus=isAccountLocked(email);
+    if(lockStatus&&lockStatus.locked){
+        const minutes=Math.floor(lookStatus.remainingTime/60);
+        const seconds=lookStatus.remainingTime%60;
+        return res.status(429).json({
+            message: `Cuenta bloqueada. Intente nuevamente en ${minutes} minutos y ${seconds} segundos.`,
+            remainingTime: lookStatus.remainingTime,
+            lockedUntil:Date.now()+(lockStatus.remainingTime*1000)
+        });
+    }
+
     try {
         // Buscar usuario por email
         const [users] = await pool.query(
@@ -82,7 +154,12 @@ exports.login = async (req, res) => {
         );
 
         if (users.length === 0) {
-            return res.status(401).json({ message: "Credenciales inválidas" });
+            const attemptData=recordFailedLoginAttempt(email);
+            const remainingAttempts=MAX_ATTEMPTS-attemptData.attempts;
+            return res.status(401).json({ 
+                message: "Credenciales inválidas", 
+                remainingAttempts:remainingAttempts>0?remainingAttempts:0
+            });
         }
 
         const user = users[0];
@@ -95,8 +172,16 @@ exports.login = async (req, res) => {
         // Verificar contraseña
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: "Credenciales inválidas" });
+            const attemptData=recordFailedLoginAttempt(email);
+            const remainingAttempts=MAX_ATTEMPTS-attemptData.attempts;
+
+            return res.status(401).json({ message: "Credenciales inválidas",
+                remainingAttempts:remainingAttempts>0?remainingAttempts:0
+            });
         }
+
+        //Login exitoso, limpiar intentos
+        clearLoginAttempts(email);
 
         // Generar token JWT
         const token = jwt.sign(

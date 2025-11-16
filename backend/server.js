@@ -9,6 +9,7 @@ const contactRoutes = require("./routes/contact.routes");
 const authRoutes = require("./routes/auth.routes");
 const captchaRoutes = require("./routes/captcha.routes");
 const aiRoutes = require("./routes/ai.routes");
+const passwordRoutes = require("./routes/password.routes");
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/captcha", captchaRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/password", passwordRoutes);
 
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`);
