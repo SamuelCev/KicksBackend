@@ -253,10 +253,23 @@ export async function getProducts(categoria = null, hasDescuento = null) {
         const response = await peticionAPI(url, 'GET');
         
         if (response.ok) {
-            return { 
-                success: true, 
-                products: response 
-            };
+            let productos = response;
+            if (!Array.isArray(productos)) {
+                const keys = Object.keys(productos).filter(k => !['ok', 'status'].includes(k));
+
+                if (keys.length > 0 && keys.every(k => !isNaN(k))) {
+                    productos = keys
+                        .map(k => productos[k])
+                        .filter(v => v && typeof v === 'object');
+                } else {
+                    productos = [];
+                }
+            }
+
+            return {
+                success: true,
+                products: productos
+            }
         } else {
             return { 
                 success: false, 

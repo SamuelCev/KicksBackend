@@ -1,22 +1,56 @@
-import { obtenerCarrito } from './api/carrito.js';
-import { API_URL } from './api/config.js';
 import { getSwalConfig } from './utils/utilities.js';
+import { 
+    getCart, 
+    getPaises, 
+    getOxxoDetails, 
+    getInfoTransferencia,
+    createOrder,
+    protectPage
+} from './utils/auth.js';
+import { API_URL } from './api/config.js';
 
-const BACKEND_URL = 'http://localhost:3000';
-
+// ============================================
+// Variables Globales
+// ============================================
 let carritoItems = [];
 let paisesDisponibles = [];
 let paisSeleccionado = null;
+await protectPage();
+
+
+// ============================================
+// Funciones de Utilidad
+// ============================================
 
 /**
  * Obtener URL completa de la imagen
  */
 function obtenerUrlImagen(imagenPath) {
+    if (!imagenPath) return '../assets/images/placeholder.png';
+    
+    // Si ya es una URL completa, retornarla
+    if (imagenPath.startsWith('http')) return imagenPath;
+    
+    // Si es una ruta relativa, construir URL completa
+    return `${API_URL}/uploads/${imagenPath}`;
+}
+
+// ============================================
+// Funciones de Carga de Datos
+// ============================================
+
+/**
+ * Cargar países disponibles
+ */
+async function cargarPaises() {
     try {
-        const response = await fetch(`${API_URL}/ordenes/paises`);
-        if (!response.ok) throw new Error('Error al cargar países');
+        const result = await getPaises();
         
-        paisesDisponibles = await response.json();
+        if (!result.success) {
+            throw new Error(result.error);
+        }
+        
+        paisesDisponibles = result.paises;
         
         const select = document.getElementById('pais');
         select.innerHTML = '<option value="">Selecciona tu país</option>';
@@ -43,7 +77,13 @@ function obtenerUrlImagen(imagenPath) {
  */
 async function cargarCarrito() {
     try {
-        carritoItems = await obtenerCarrito();
+        const result = await getCart();
+        
+        if (!result.success) {
+            throw new Error(result.error);
+        }
+        
+        carritoItems = result.cart;
         
         if (carritoItems.length === 0) {
             window.location.href = 'carrito.html';
@@ -64,6 +104,10 @@ async function cargarCarrito() {
         });
     }
 }
+
+// ============================================
+// Funciones de Renderizado
+// ============================================
 
 /**
  * Renderizar items del carrito
@@ -106,8 +150,8 @@ function calcularTotales() {
     let impuestos = 0;
     
     if (paisSeleccionado) {
-        envio = paisSeleccionado.gasto_envio;
-        impuestos = subtotal * paisSeleccionado.impuesto;
+        envio = parseFloat(paisSeleccionado.gasto_envio) || 0;
+        impuestos = subtotal * (parseFloat(paisSeleccionado.impuesto) || 0);
     }
     
     const total = subtotal + envio + impuestos;
@@ -117,6 +161,10 @@ function calcularTotales() {
     document.getElementById('impuestos').textContent = `$${impuestos.toFixed(2)}`;
     document.getElementById('total').textContent = `$${total.toFixed(2)}`;
 }
+
+// ============================================
+// Manejadores de Eventos
+// ============================================
 
 /**
  * Manejar cambio de país
@@ -138,8 +186,13 @@ function handleMetodoPagoChange(event) {
     
     // Mostrar el formulario correspondiente
     const metodo = event.target.value;
-    const formId = `${metodo === 'tarjeta' ? 'card' : metodo}-${metodo === 'tarjeta' ? 'form' : 'info'}`;
-    document.getElementById(formId)?.classList.add('active');
+    const formId = metodo === 'tarjeta' ? 'card-form' : 
+                   metodo === 'oxxo' ? 'oxxo-info' : 'transfer-info';
+    
+    const form = document.getElementById(formId);
+    if (form) {
+        form.classList.add('active');
+    }
 }
 
 /**
@@ -161,6 +214,10 @@ function formatearFechaExpiracion(event) {
     }
     event.target.value = value;
 }
+
+// ============================================
+// Validaciones
+// ============================================
 
 /**
  * Validar formulario de tarjeta
@@ -194,6 +251,10 @@ function validarDatosTarjeta() {
         cvv: cvv
     };
 }
+
+// ============================================
+// Procesamiento de Pedido
+// ============================================
 
 /**
  * Confirmar pedido
@@ -243,22 +304,11 @@ async function confirmarPedido() {
     btn.textContent = 'Procesando...';
     
     try {
-        // Crear la orden
-        const response = await fetch(`${API_URL}/ordenes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify(ordenData)
-        });
+        const result = await createOrder(ordenData);
         
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Error al crear la orden');
+        if (!result.success) {
+            throw new Error(result.error);
         }
-        
-        const data = await response.json();
         
         // Manejar respuesta según método de pago
         if (metodo_pago === 'oxxo') {
@@ -266,7 +316,7 @@ async function confirmarPedido() {
         } else if (metodo_pago === 'transferencia') {
             await mostrarDatosTransferencia();
         } else {
-            await mostrarConfirmacionTarjeta(data.orderId);
+            await mostrarConfirmacionTarjeta(result.orderId);
         }
         
     } catch (error) {
@@ -282,15 +332,20 @@ async function confirmarPedido() {
     }
 }
 
+// ============================================
+// Confirmaciones de Pago
+// ============================================
+
 /**
  * Mostrar referencia OXXO
  */
 async function mostrarReferenciaOXXO() {
     try {
-        const response = await fetch(`${API_URL}/ordenes/oxxo-details`);
-        if (!response.ok) throw new Error('Error al obtener referencia OXXO');
+        const result = await getOxxoDetails();
         
-        const data = await response.json();
+        if (!result.success) {
+            throw new Error(result.error);
+        }
         
         await Swal.fire({
             icon: 'success',
@@ -299,7 +354,7 @@ async function mostrarReferenciaOXXO() {
                 <div style="padding: 20px; text-align: left;">
                     <p style="margin-bottom: 15px;">Tu pedido ha sido registrado exitosamente.</p>
                     <p style="margin-bottom: 15px;"><strong>Referencia OXXO:</strong></p>
-                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--color-acento); text-align: center; padding: 15px; background: rgba(208,17,16,0.1); border-radius: 8px;">${data.referencia}</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--color-acento); text-align: center; padding: 15px; background: rgba(208,17,16,0.1); border-radius: 8px;">${result.referencia}</p>
                     <p style="margin-top: 15px; font-size: 0.9rem; color: var(--color-secundario);">Presenta esta referencia en cualquier tienda OXXO para completar tu pago.</p>
                 </div>
             `,
@@ -310,6 +365,12 @@ async function mostrarReferenciaOXXO() {
         window.location.href = 'productos.html';
     } catch (error) {
         console.error('Error al obtener referencia OXXO:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo obtener la referencia OXXO',
+            ...getSwalConfig()
+        });
     }
 }
 
@@ -318,10 +379,13 @@ async function mostrarReferenciaOXXO() {
  */
 async function mostrarDatosTransferencia() {
     try {
-        const response = await fetch(`${API_URL}/ordenes/info-transferencia`);
-        if (!response.ok) throw new Error('Error al obtener datos de transferencia');
+        const result = await getInfoTransferencia();
         
-        const data = await response.json();
+        if (!result.success) {
+            throw new Error(result.error);
+        }
+        
+        const data = result.info;
         
         await Swal.fire({
             icon: 'success',
@@ -347,6 +411,12 @@ async function mostrarDatosTransferencia() {
         window.location.href = 'productos.html';
     } catch (error) {
         console.error('Error al obtener datos de transferencia:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudieron obtener los datos de transferencia',
+            ...getSwalConfig()
+        });
     }
 }
 
@@ -371,28 +441,51 @@ async function mostrarConfirmacionTarjeta(orderId) {
     window.location.href = 'productos.html';
 }
 
+// ============================================
+// Inicialización
+// ============================================
+
 /**
- * Inicializar eventos
+ * Inicializar eventos y cargar datos
  */
 document.addEventListener('DOMContentLoaded', async () => {
     // Cargar datos iniciales
     await cargarPaises();
     await cargarCarrito();
     
-    // Event listeners
-    document.getElementById('pais').addEventListener('change', handlePaisChange);
+    // Event listeners - País
+    const paisSelect = document.getElementById('pais');
+    if (paisSelect) {
+        paisSelect.addEventListener('change', handlePaisChange);
+    }
     
+    // Event listeners - Método de pago
     document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
         radio.addEventListener('change', handleMetodoPagoChange);
     });
     
-    document.getElementById('card_number')?.addEventListener('input', formatearNumeroTarjeta);
-    document.getElementById('card_expiry')?.addEventListener('input', formatearFechaExpiracion);
+    // Event listeners - Formateo de tarjeta
+    const cardNumber = document.getElementById('card_number');
+    if (cardNumber) {
+        cardNumber.addEventListener('input', formatearNumeroTarjeta);
+    }
     
-    // Solo permitir números en CVV
-    document.getElementById('card_cvv')?.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/\D/g, '');
-    });
+    const cardExpiry = document.getElementById('card_expiry');
+    if (cardExpiry) {
+        cardExpiry.addEventListener('input', formatearFechaExpiracion);
+    }
     
-    document.getElementById('btn-confirmar-pago').addEventListener('click', confirmarPedido);
+    // Event listener - Solo números en CVV
+    const cardCvv = document.getElementById('card_cvv');
+    if (cardCvv) {
+        cardCvv.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+    }
+    
+    // Event listener - Botón confirmar pedido
+    const btnConfirmar = document.getElementById('btn-confirmar-pago');
+    if (btnConfirmar) {
+        btnConfirmar.addEventListener('click', confirmarPedido);
+    }
 });
