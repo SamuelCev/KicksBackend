@@ -151,3 +151,136 @@ exports.requestPasswordReset = async (req, res) => {
     }
 };
 
+// Validar código y cambiar contraseña
+exports.resetPasswordWithCode = async (req, res) => {
+    const { email, code, newPassword } = req.body;
+
+    // Validación de campos
+    if (!email || !code || !newPassword) {
+        return res.status(400).json({ 
+            message: "Email, código y nueva contraseña son obligatorios" 
+        });
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Formato de email inválido" });
+    }
+
+    // Validar fortaleza de la nueva contraseña
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+        return res.status(400).json({ 
+            message: "La contraseña debe tener mínimo 8 caracteres, incluir mayúsculas, minúsculas, números y caracteres especiales" 
+        });
+    }
+
+    try {
+        // Verificar si existe un código de recuperación para este email
+        const recoveryData = recoveryCodes.get(email);
+
+        if (!recoveryData) {
+            return res.status(400).json({ 
+                message: "Código inválido o expirado. Solicita uno nuevo" 
+            });
+        }
+
+        // Verificar si el código ha expirado
+        if (Date.now() > recoveryData.expiresAt) {
+            recoveryCodes.delete(email);
+            return res.status(400).json({ 
+                message: "El código ha expirado. Solicita uno nuevo" 
+            });
+        }
+
+        // Verificar límite de intentos
+        if (recoveryData.attempts >= MAX_CODE_ATTEMPTS) {
+            recoveryCodes.delete(email);
+            return res.status(429).json({ 
+                message: "Demasiados intentos fallidos. Solicita un nuevo código" 
+            });
+        }
+
+        // Validar el código
+        if (recoveryData.code !== code) {
+            recoveryData.attempts += 1;
+            recoveryCodes.set(email, recoveryData);
+            
+            const remainingAttempts = MAX_CODE_ATTEMPTS - recoveryData.attempts;
+            return res.status(400).json({ 
+                message: "Código incorrecto",
+                remainingAttempts: remainingAttempts
+            });
+        }
+
+        // Código válido - proceder a cambiar la contraseña
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        const [result] = await pool.query(
+            'UPDATE usuarios SET password = ? WHERE id = ? AND status = 1',
+            [hashedPassword, recoveryData.userId]
+        );
+
+        if (result.affectedRows === 0) {
+            recoveryCodes.delete(email);
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        // Eliminar el código usado
+        recoveryCodes.delete(email);
+
+        // Enviar email de confirmación
+        try {
+            await transporter.sendMail({
+                from: `"${process.env.APP_NAME || 'Tu Aplicación'}" <${process.env.EMAIL_USER}>`,
+                to: email,
+                subject: 'Contraseña cambiada exitosamente',
+                html: `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                            .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+                            .content { background-color: #f9f9f9; padding: 30px; border: 1px solid #ddd; border-radius: 0 0 5px 5px; }
+                            .success { color: #4CAF50; font-size: 48px; text-align: center; }
+                            .warning { color: #f44336; margin-top: 20px; padding: 15px; background-color: #ffebee; border-radius: 5px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <div class="header">
+                                <h1>Contraseña Actualizada</h1>
+                            </div>
+                            <div class="content">
+                                <div class="success">✓</div>
+                                <p>Tu contraseña ha sido cambiada exitosamente.</p>
+                                <p>Ya puedes iniciar sesión con tu nueva contraseña.</p>
+                                <div class="warning">
+                                    <strong>⚠️ ¿No realizaste este cambio?</strong><br>
+                                    Si no fuiste tú quien cambió la contraseña, contacta inmediatamente con soporte.
+                                </div>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `
+            });
+        } catch (emailError) {
+            console.error("Error al enviar email de confirmación:", emailError);
+            // No fallar la operación si el email de confirmación falla
+        }
+
+        res.json({ 
+            message: "Contraseña cambiada exitosamente. Ya puedes iniciar sesión" 
+        });
+
+    } catch (error) {
+        console.error("Error al cambiar contraseña:", error);
+        res.status(500).json({ 
+            message: "Error al cambiar la contraseña. Por favor, intenta más tarde" 
+        });
+    }
+};
