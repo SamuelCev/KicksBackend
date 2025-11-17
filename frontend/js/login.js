@@ -1,5 +1,7 @@
-import { login } from "./utils/auth.js"; 
+import { login, redirectIfAuthenticated } from "./utils/auth.js"; 
 import { getSwalConfig } from "./utils/utilities.js";
+
+await redirectIfAuthenticated(); 
 
 // Obtener el formulario
 const loginForm = document.getElementById('login-form');

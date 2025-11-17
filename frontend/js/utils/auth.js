@@ -235,6 +235,87 @@ export async function changePassword(currentPassword, newPassword) {
         };
     }
 }
+// Enviar correo electronico con codigo de verificacion
+export async function resetPasswordEmail(email) {
+    try {
+        const response = await peticionAPI(
+            API_ENDPOINTS.AUTH.CORREO_RECUPERACION,
+            'POST',
+            { email }
+        );
+        if (response.ok) {
+            return {
+                success: true,
+                message: response.message
+            };
+        } else {
+            return {
+                success: false,
+                error: response.error || 'Error al enviar correo de recuperación'
+            };
+        }
+
+    } catch (error) {
+        return {
+            success: false,
+            error: 'Error de conexión con el servidor'
+        };
+    }
+}
+// Verificar que el codigo capturado sea correcto
+export async function verifyCode(email, code) {
+    try {
+        const response = await peticionAPI(
+            API_ENDPOINTS.AUTH.VERIFICAR_CODIGO,
+            'POST',
+            { email, code }
+        );
+        if (response.ok) {
+            return {
+                success: true,
+                message: response.message,
+                resetToken: response.resetToken
+            };
+        } else {
+            return {
+                success: false,
+                error: response.error || 'Código incorrecto o expirado'
+            };
+        }
+
+    } catch (error) {
+        return {
+            success: false,
+            error: 'Error de conexión con el servidor'
+        };
+    }
+}
+// Cambiar la contraseña
+export async function resetPassword(resetToken, newPassword) {
+    try {
+        const response = await peticionAPI(
+            API_ENDPOINTS.AUTH.REESTABLECER_CONTRASENA,
+            'POST',
+            { resetToken, newPassword }
+        );
+        if (response.ok) {
+            return {
+                success: true,
+                message: response.message
+            };
+        } else {
+            return {
+                success: false,
+                error: response.error || 'Error al restablecer contraseña'
+            };
+        }
+    } catch (error) {
+        return {
+            success: false,
+            error: 'Error de conexión con el servidor'
+        };
+    }
+}
 
 //============================================
 // Endpoints de Productos

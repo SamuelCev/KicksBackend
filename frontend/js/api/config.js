@@ -7,7 +7,9 @@ export const API_ENDPOINTS = {
     REGISTER: '/auth/register',
     LOGOUT: '/auth/logout',
     PERFIL: '/auth/perfil',
-    CAMBIAR_PASSWORD: '/auth/cambiar-contrasena',
+    CORREO_RECUPERACION: '/password/request-reset',
+    REESTABLECER_CONTRASENA: '/password/reset',
+    VERIFICAR_CODIGO: '/password/verify-code',
   },
   
   // Productos

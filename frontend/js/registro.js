@@ -1,5 +1,7 @@
-import { register } from "./utils/auth.js"; 
+import { register, redirectIfAuthenticated } from "./utils/auth.js"; 
 import { getSwalConfig } from "./utils/utilities.js";
+
+await redirectIfAuthenticated();
 
 // Obtener el formulario
 const registroForm = document.getElementById('registro-form');
