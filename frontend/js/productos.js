@@ -4,6 +4,8 @@
 import { renderProductCards } from '../components/product-card.js';
 import { getProducts } from './utils/auth.js';
 import { API_URL } from './api/config.js';
+import { aiChatIcon, trashIcon } from './utils/icons.js';
+import '../js/utils/chat.js'
 
 // ============================================
 // VARIABLES GLOBALES
@@ -12,6 +14,9 @@ let todosLosProductos = [];
 let productosFiltrados = [];
 
 // Referencias a elementos del DOM
+document.getElementById('chatFabIcon').innerHTML = aiChatIcon;
+document.getElementById('chatHeaderIcon').innerHTML = aiChatIcon;
+document.getElementById('clearChat').innerHTML = trashIcon;
 const productosGrid = document.getElementById('productos-grid');
 const searchInput = document.getElementById('search-input');
 const categoryFilter = document.getElementById('category-filter');

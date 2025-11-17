@@ -7,6 +7,12 @@
 	<title>Política de Privacidad — KICKS</title>
 	<link rel="stylesheet" href="../css/globals.css">
 	<link rel="stylesheet" href="../css/index.css">
+	<link rel="stylesheet" href="../css/chat.css">
+
+	<!-- SweetAlert2 -->
+  	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 	<script>
 		(function() {
 			const storedTheme = localStorage.getItem("theme");
@@ -143,19 +149,69 @@
 		</section>
 	</main>
 
+	<!-- Botón flotante para abrir el chat -->
+	<button class="chat-fab" id="chatFab">
+		<span class="chat-fab-icon" id="chatFabIcon"></span>
+	</button>
+
+	<!-- Modal del chat -->
+	<div class="chat-modal" id="chatModal">
+		<div class="chat-container">
+			
+			<!-- Header del chat -->
+			<div class="chat-header">
+				<div class="chat-header-info">
+					<span class="chat-icon" id="chatHeaderIcon"></span>
+					<h3>Kicksy</h3>
+				</div>
+				<div class="chat-header-actions">
+					<button class="btn-icon" id="clearChat" title="Limpiar conversación">
+						<span id="clearChat"></span>
+					</button>
+					<button class="btn-icon" id="closeChat" title="Cerrar">
+						✕
+					</button>
+				</div>
+			</div>
+
+			<div class="chat-messages" id="chatMessages"></div>
+
+			<div class="chat-input-container">
+				<form id="chatForm" class="chat-form">
+					<textarea 
+						id="messageInput" 
+						class="chat-input" 
+						placeholder="Escribe tu mensaje..."
+						rows="1"
+						required
+					></textarea>
+					<button type="submit" class="chat-send-btn">
+						➤
+					</button>
+				</form>
+			</div>
+
+		</div>
+	</div>
+
 	<script type="module">
 		import { ThemeBtn } from '../components/theme-btn.js';
 		import { Header } from '../components/header.js';
 		import { Footer } from '../components/footer.js';
+		import { aiChatIcon, trashIcon } from '../js/utils/icons.js';
+		import '../js/utils/chat.js';
 
 		ThemeBtn();
 
-		const header = Header();
+		document.getElementById('chatFabIcon').innerHTML = aiChatIcon;
+		document.getElementById('chatHeaderIcon').innerHTML = aiChatIcon;
+		document.getElementById('clearChat').innerHTML = trashIcon;
+
+		const header = await Header();
 		document.body.insertBefore(header, document.body.firstChild);
 
 		const footer = Footer();
 		document.body.appendChild(footer);
 	</script>
-	<script src="../js/main.js"></script>
 </body>
 </html>
