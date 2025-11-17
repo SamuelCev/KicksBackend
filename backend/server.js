@@ -10,6 +10,7 @@ const authRoutes = require("./routes/auth.routes");
 const captchaRoutes = require("./routes/captcha.routes");
 const aiRoutes = require("./routes/ai.routes");
 const passwordRoutes = require("./routes/password.routes");
+const { swaggerDocs } = require("./swagger");
 
 dotenv.config();
 
@@ -46,4 +47,6 @@ app.use("/api/password", passwordRoutes);
 
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`);
+
+    swaggerDocs(app, PORT);
 });
