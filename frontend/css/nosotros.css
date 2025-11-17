@@ -140,30 +140,50 @@
     margin: 0;
 }
 
+/* Responsive Design */
+@media (max-width: 968px) {
+
+    .equipo-grid {
+        grid-template-columns: 1fr;
+    }
+    
+}
+
 @media (max-width: 768px) {
-  .nosotros-page {
-    padding: 100px 0 60px;
-  }
-
-  .nosotros-page .container {
-    padding: 0 20px;
-  }
-
-  .historia-title {
-    font-size: 2.5rem;
-  }
-
-  .historia-subtitle {
-    font-size: 1rem;
-  }
+    
+    .nosotros-page {
+        padding: 100px 0 60px;
+    }
+    
+    .nosotros-page .container {
+        padding: 0 20px;
+    }
+    
+    .historia-title {
+        font-size: 2.5rem;
+    }
+    
+    .historia-subtitle {
+        font-size: 1rem;
+    }
+    
+    .equipo-title {
+        font-size: 1.75rem;
+    }
+    
+    .equipo-image-wrapper {
+        width: 100px;
+        height: 100px;
+    }
 }
 
 @media (max-width: 480px) {
-  .nosotros-page .container {
-    padding: 0 16px;
-  }
-
-  .historia-title {
-    font-size: 2rem;
-  }
+    
+    .nosotros-page .container {
+        padding: 0 16px;
+    }
+    
+    .historia-title {
+        font-size: 2rem;
+    }
 }
