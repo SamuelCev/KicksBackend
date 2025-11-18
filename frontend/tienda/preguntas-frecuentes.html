@@ -12,7 +12,7 @@
   
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/globals.css">
-  <link rel="stylesheet" href="../css/login.css">
+  <link rel="stylesheet" href="../css/preguntas.css">
   
   <!-- Script para aplicar tema antes del render -->
   <script>
@@ -23,10 +23,149 @@
       document.documentElement.setAttribute("data-theme", theme);
     })();
   </script>
+  
+  <!-- Script para el despliegue de preguntas -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const faqItems = document.querySelectorAll(".faq-item");
+
+    faqItems.forEach((item) => {
+      const question = item.querySelector(".faq-question");
+
+      question.addEventListener("click", () => {
+        // Si quieres que solo haya una abierta a la vez, descomenta este bloque:
+        // faqItems.forEach((otherItem) => {
+        //   if (otherItem !== item) {
+        //     otherItem.classList.remove("open");
+        //   }
+        // });
+
+        item.classList.toggle("open");
+      });
+    });
+    });
+  </script>
 </head>
 <body>
+  <section class="faq-section">
+  <div class="faq-container">
+    <header class="faq-header">
+      <h1 class="faq-title">Preguntas Frecuentes</h1>
+      <p class="faq-intro">
+        Aquí encontrarás respuestas a las dudas más comunes sobre KICK<span class="red-five">5</span>, 
+        nuestros envíos, garantías y cómo elegir el mejor par para tu juego, tus rutas o tus carreras.
+      </p>
+    </header>
 
+    <div class="faq-list">
 
+      <!-- FAQ 1 -->
+      <div class="faq-item">
+        <h2 class="faq-question">
+          ¿Qué hace diferente a KICK<span class="red-five">5</span> de otras tiendas de tenis en línea?
+        </h2>
+        <p class="faq-answer">
+          En KICK<span class="red-five">5</span> combinamos la experiencia real de un jugador de baloncesto, 
+          un senderista, un corredor y un diseñador de moda. Eso significa que cada par que ves en la tienda 
+          ha sido elegido pensando en el rendimiento en la cancha, la comodidad en los senderos, la ligereza 
+          al correr y el estilo que llevas todos los días. No vendemos “cualquier tenis”, sino pares que 
+          realmente acompañan tu ritmo de vida.
+        </p>
+      </div>
+
+      <!-- FAQ 2 -->
+      <div class="faq-item">
+        <h2 class="faq-question">
+          ¿Los tenis que venden en KICK<span class="red-five">5</span> son originales?
+        </h2>
+        <p class="faq-answer">
+          Sí. Todos nuestros productos son 100% originales y provienen de proveedores autorizados. 
+          Nos tomamos muy en serio la autenticidad, porque sabemos que la calidad, el desempeño y la durabilidad 
+          dependen de materiales reales y procesos de fabricación certificados.
+        </p>
+      </div>
+
+      <!-- FAQ 3 -->
+      <div class="faq-item">
+        <h2 class="faq-question">
+          ¿Cómo funcionan los envíos y cuánto tardan en llegar mis tenis?
+        </h2>
+        <p class="faq-answer">
+          Realizamos envíos a la mayoría de los estados de México. Una vez confirmado el pago, 
+          procesamos tu pedido normalmente dentro de 1 a 2 días hábiles. El tiempo de entrega suele 
+          oscilar entre 3 y 7 días hábiles dependiendo de tu ciudad y la paquetería. Al enviar tu pedido, 
+          te compartimos un número de guía para que puedas rastrearlo en todo momento.
+        </p>
+      </div>
+
+      <!-- FAQ 4 -->
+      <div class="faq-item">
+        <h2 class="faq-question">
+          ¿Qué pasa si la talla no me queda bien? ¿Puedo hacer cambios o devoluciones?
+        </h2>
+        <p class="faq-answer">
+          Sabemos que elegir talla en línea puede ser complicado, por eso contamos con una política de cambio 
+          por talla dentro de los primeros 30 días después de recibir tu pedido, siempre que el producto esté 
+          sin usar y en su empaque original. Solo tienes que escribirnos con tu número de pedido y te guiaremos 
+          paso a paso en el proceso.
+        </p>
+      </div>
+
+      <!-- FAQ 5 -->
+      <div class="faq-item">
+        <h2 class="faq-question">
+          ¿Ofrecen garantía en los tenis que compro?
+        </h2>
+        <p class="faq-answer">
+          Sí. Todos nuestros productos cuentan con garantía por defectos de fabricación. 
+          Si tu par llega dañado o notas un defecto fuera de lo normal en las primeras semanas de uso, 
+          contáctanos con fotos y tu comprobante de compra. Nuestro equipo revisará el caso y, si procede, 
+          gestionará un cambio o solución adecuada para ti.
+        </p>
+      </div>
+
+      <!-- FAQ 6 -->
+      <div class="faq-item">
+        <h2 class="faq-question">
+          ¿Cómo elijo el modelo ideal para mí: Running, Básquetbol o Senderismo?
+        </h2>
+        <p class="faq-answer">
+          En cada producto encontrarás una descripción pensada por nuestro equipo: Daniel se enfoca en los 
+          modelos de baloncesto, Samuel en running y Carlos en senderismo, mientras que Ibrahim cuida el estilo 
+          y la identidad de cada par. Si tienes dudas, puedes escribirnos y contarnos cómo los piensas usar 
+          (distancia, tipo de cancha, tipo de terreno, etc.) y te ayudaremos a elegir el modelo que mejor se 
+          adapte a tu actividad.
+        </p>
+      </div>
+
+      <!-- FAQ 7 -->
+      <div class="faq-item">
+        <h2 class="faq-question">
+          ¿Qué métodos de pago aceptan y es seguro comprar en KICK<span class="red-five">5</span>?
+        </h2>
+        <p class="faq-answer">
+          Aceptamos los métodos de pago más comunes en México (como tarjetas bancarias y, dependiendo de la 
+          configuración de la tienda, plataformas de pago en línea). Trabajamos con proveedores de pago seguros 
+          que cifran tu información, para que tus datos estén protegidos en todo momento.
+        </p>
+      </div>
+
+      <!-- FAQ 8 -->
+      <div class="faq-item">
+        <h2 class="faq-question">
+          ¿Tienen tienda física o solo venden en línea?
+        </h2>
+        <p class="faq-answer">
+          Por ahora, KICK<span class="red-five">5</span> funciona como una tienda en línea pensada para llegar 
+          a más personas sin importar la ciudad en la que vivan. Sin embargo, nuestro equipo sigue explorando 
+          la posibilidad de eventos, puntos de pickup y colaboraciones locales. Puedes seguirnos en nuestras 
+          redes sociales para enterarte de las próximas novedades.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
 
   <!-- Scripts -->
   <script type="module">
