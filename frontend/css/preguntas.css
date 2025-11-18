@@ -1,5 +1,9 @@
 /* Sección de Preguntas Frecuentes (FAQ) */
 
+.red-five {
+    color: #d01110;
+}
+
 .faq-section {
   padding: 24px 16px;
   background-color: var(--color-fondo);
