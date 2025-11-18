@@ -4,11 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="../assets/img/favicon.ico" type="image/x-icon">
-  <title>Suscripcion - KICKS</title>
+  <title>Suscripción Newsletter - KICKS</title>
   
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/globals.css">
-  <link rel="stylesheet" href="../css/login.css">
+  <link rel="stylesheet" href="../css/suscripcion.css">
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <!-- Script para aplicar tema antes del render -->
   <script>
@@ -22,7 +26,177 @@
 </head>
 <body>
 
+  <!-- Página de Suscripción -->
+  <main class="suscripcion-page">
+    <div class="container">
+      <div class="suscripcion-grid">
+        
+        <!-- Columna Izquierda - Información -->
+        <div class="info-column">
+          <div class="info-content">
+            <!-- Logo o Icono grande -->
+            <div class="newsletter-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
 
+            <h1 class="main-title">Únete a la comunidad KICKS</h1>
+            <p class="main-subtitle">
+              Más de 50,000 sneakerheads ya reciben nuestro newsletter. 
+              Sé el primero en conocer los últimos lanzamientos, ofertas exclusivas 
+              y contenido premium sobre el mundo de los sneakers.
+            </p>
+
+            <!-- Beneficios destacados -->
+            <div class="beneficios-destacados">
+              <div class="beneficio-card">
+                <div class="beneficio-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
+                </div>
+                <div class="beneficio-info">
+                  <h3>Ofertas Exclusivas</h3>
+                  <p>Descuentos de hasta 40% solo para suscriptores</p>
+                </div>
+              </div>
+
+              <div class="beneficio-card">
+                <div class="beneficio-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                  </svg>
+                </div>
+                <div class="beneficio-info">
+                  <h3>Acceso Anticipado</h3>
+                  <p>Conoce los drops antes que nadie</p>
+                </div>
+              </div>
+
+              <div class="beneficio-card">
+                <div class="beneficio-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <div class="beneficio-info">
+                  <h3>Comunidad</h3>
+                  <p>Únete a miles de amantes de sneakers</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+              <div class="stat-item">
+                <div class="stat-number">50K+</div>
+                <div class="stat-label">Suscriptores</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Productos</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Satisfacción</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha - Formulario -->
+        <div class="form-column">
+          <div class="form-wrapper">
+            <div class="form-header">
+              <h2 class="form-title">Suscríbete ahora</h2>
+              <p class="form-subtitle">Comienza a recibir contenido exclusivo</p>
+            </div>
+
+            <form class="suscripcion-form" id="suscripcion-form">
+              <div class="form-group">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                  <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input" 
+                    placeholder="tu@email.com"
+                    required
+                    autocomplete="email"
+                  >
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-submit">
+                <span class="btn-text">Suscribirme gratis</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </form>
+
+            <!-- Lista de beneficios compacta -->
+            <div class="beneficios-list">
+              <div class="beneficio-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Sin spam, solo contenido de valor</span>
+              </div>
+              <div class="beneficio-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Cancela tu suscripción cuando quieras</span>
+              </div>
+              <div class="beneficio-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>100% gratis, siempre</span>
+              </div>
+            </div>
+
+            <!-- Testimonios rápidos -->
+            <div class="testimonios">
+              <div class="testimonio">
+                <div class="testimonio-avatar">JM</div>
+                <div class="testimonio-content">
+                  <p>"Las mejores ofertas llegan siempre primero aquí"</p>
+                  <span>- Juan M.</span>
+                </div>
+              </div>
+              <div class="testimonio">
+                <div class="testimonio-avatar">LP</div>
+                <div class="testimonio-content">
+                  <p>"Me ahorro cientos en cada compra"</p>
+                  <span>- Laura P.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nota de privacidad -->
+            <p class="privacy-note">
+              Al suscribirte, aceptas nuestra 
+              <a href="../politica-privacidad/politica-privacidad.html">Política de privacidad</a>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
 
   <!-- Scripts -->
   <script type="module">
@@ -38,6 +212,7 @@
     document.body.insertBefore(header, document.body.firstChild);
     document.body.appendChild(footer);
   </script>
+  <script type="module" src="../js/suscripcion.js"></script>
 
 </body>
 </html>
