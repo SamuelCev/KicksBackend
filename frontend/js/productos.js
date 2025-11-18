@@ -3,7 +3,7 @@
 // ============================================
 import { renderProductCards } from '../components/product-card.js';
 import { getProducts } from './utils/auth.js';
-import { API_URL } from './api/config.js';
+import { API_URL } from './utils/config.js';
 import { aiChatIcon, trashIcon } from './utils/icons.js';
 import '../js/utils/chat.js'
 

@@ -1,4 +1,4 @@
-import { API_URL, API_ENDPOINTS } from '../api/config.js';
+import { API_URL, API_ENDPOINTS } from './config.js';
 
 // Variable temporal en memoria para el usuario actual
 let currentUser = null;

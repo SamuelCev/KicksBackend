@@ -1,6 +1,6 @@
 import { getCart, updateCartItem, removeFromCart, protectPage } from '../js/utils/auth.js';
 import { cartIcon } from '../js/utils/icons.js';
-import { API_URL } from './api/config.js';
+import { API_URL } from './utils/config.js';
 
 await protectPage();
 let carritoItems = [];

@@ -7,7 +7,7 @@ import {
     createOrder,
     protectPage
 } from './utils/auth.js';
-import { API_URL } from './api/config.js';
+import { API_URL } from './utils/config.js';
 
 // ============================================
 // Variables Globales

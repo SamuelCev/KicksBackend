@@ -1,13 +1,10 @@
-import { API_URL } from './api/config.js';
+import { API_URL } from './utils/config.js';
 import { agregarAlCarrito } from './api/carrito.js';
 import { cartIcon } from './utils/icons.js';
-import { getSwalConfig } from './utils/utilities.js';
 
-const BACKEND_URL = 'http://localhost:3000';
 let currentProduct = null;
 let currentQuantity = 1;
 let currentImages = [];
-let currentImageIndex = 0;
 
 /**
  * Obtener URL completa de la imagen

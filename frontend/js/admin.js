@@ -2,7 +2,7 @@
 // IMPORTS
 // ============================================
 import { getSwalConfig } from './utils/utilities.js';
-import { API_URL } from './api/config.js';
+import { API_URL } from './utils/config.js';
 import { 
     getProducts,
     getProductByID,

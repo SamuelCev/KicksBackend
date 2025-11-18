@@ -3,7 +3,7 @@
 // ============================================
 
 import { peticionAPI } from './utils/auth.js';
-import { API_ENDPOINTS } from './api/config.js';
+import { API_ENDPOINTS } from './utils/config.js';
 
 const form = document.getElementById('contacto-form');
 
