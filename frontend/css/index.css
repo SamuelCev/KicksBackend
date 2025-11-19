@@ -87,6 +87,7 @@
   background-color: var(--color-blanco);
   color: var(--color-negro);
 }
+
 .carousel-image {
   position: absolute;
   top: 0;
@@ -94,6 +95,14 @@
   right: 0;
   bottom: 0;
   z-index: 0;
+  overflow: hidden;
+}
+
+.carousel-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 /* Controles del Carousel */
