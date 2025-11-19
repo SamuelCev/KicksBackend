@@ -1,11 +1,12 @@
-// ============================================
-// FORMULARIO DE CONTACTO
-// ============================================
-
+import { aiChatIcon, trashIcon } from './utils/icons.js';
+import '../js/utils/chat.js'
 import { peticionAPI } from './utils/auth.js';
 import { API_ENDPOINTS } from './utils/config.js';
 
 const form = document.getElementById('contacto-form');
+document.getElementById('chatFabIcon').innerHTML = aiChatIcon;
+document.getElementById('chatHeaderIcon').innerHTML = aiChatIcon;
+document.getElementById('clearChat').innerHTML = trashIcon;
 
 // Event listener para el submit del formulario
 form.addEventListener('submit', async (e) => {

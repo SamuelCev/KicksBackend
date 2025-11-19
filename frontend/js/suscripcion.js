@@ -1,9 +1,11 @@
-// ============================================
-// FORMULARIO DE SUSCRIPCIÓN AL NEWSLETTER
-// ============================================
+import { aiChatIcon, trashIcon } from './utils/icons.js';
+import '../js/utils/chat.js'
 
 import { suscribirseNewsletter } from './utils/auth.js';
 
+document.getElementById('chatFabIcon').innerHTML = aiChatIcon;
+document.getElementById('chatHeaderIcon').innerHTML = aiChatIcon;
+document.getElementById('clearChat').innerHTML = trashIcon;
 const form = document.getElementById('suscripcion-form');
 const emailInput = document.getElementById('email');
 
