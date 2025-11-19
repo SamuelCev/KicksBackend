@@ -5,7 +5,7 @@ exports.getCaptcha = (req, res) => {
         const captcha = generateCaptcha();
         res.json({
             captchaId: captcha.id,
-            question: captcha.question
+            image: captcha.data
         });
     } catch (error) {
         console.error('Error al generar captcha:', error);

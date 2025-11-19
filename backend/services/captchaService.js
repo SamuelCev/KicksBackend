@@ -1,30 +1,27 @@
+const svgCaptcha = require('svg-captcha');
+
 const captchaStore = new Map();
+const CAPTCHA_EXPIRATION = 5 * 60 * 1000; // 5 minutos
 
 function generateCaptcha() {
-    // Generar números aleatorios entre 1 y 20
-    const num1 = Math.floor(Math.random() * 20) + 1;
-    const num2 = Math.floor(Math.random() * 20) + 1;
-    
-    // Operaciones posibles: suma y resta
-    const operations = [
-        { symbol: '+', calculate: (a, b) => a + b },
-        { symbol: '-', calculate: (a, b) => a - b }
-    ];
-    
-    const operation = operations[Math.floor(Math.random() * operations.length)];
-    const answer = operation.calculate(num1, num2);
-    const question = `¿Cuánto es ${num1} ${operation.symbol} ${num2}?`;
+    const captcha = svgCaptcha.create({
+        size: 5,
+        ignoreChars: '0o1i', 
+        noise: 3,
+        color: true,
+        background: '#f0f0f0'
+    });
     
     // Generar ID único
     const id = `captcha_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     // Almacenar el captcha con timestamp
     captchaStore.set(id, {
-        answer: answer,
+        answer: captcha.text,
         timestamp: Date.now()
     });
     
-    return { id, question };
+    return { id, data: captcha.data };
 }
 
 function validateCaptcha(captchaId, userAnswer) {
@@ -41,10 +38,10 @@ function validateCaptcha(captchaId, userAnswer) {
         return false;
     }
     
-    // Verificar la respuesta
-    const isValid = captchaData.answer === parseInt(userAnswer);
+
+    const isValid = captchaData.answer.toLowerCase() === userAnswer.toLowerCase();
     
-    // Eliminar el captcha después de validarlo (un solo uso)
+    // Eliminar el captcha después de validarlo
     captchaStore.delete(captchaId);
     
     return isValid;
