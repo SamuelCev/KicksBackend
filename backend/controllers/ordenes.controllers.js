@@ -1,6 +1,7 @@
 const { pool } = require('../services/dbConnection');
 const { sendMailWithPdf } = require('../services/emailSender');
 const { generarReciboPDF } = require('../services/generadorRecibos');
+const OrderModel = require('../models/OrderModel');
 
 exports.createOrder = async (req, res) => {
     //const userId  = req.userId;
@@ -33,10 +34,7 @@ exports.createOrder = async (req, res) => {
 
     try {
         // Calcular el subtotal del carrito
-        const [cartItems] = await pool.query(
-            'SELECT ci.producto_id, ci.cantidad, p.precio, p.descuento, p.hasDescuento FROM carrito_items ci JOIN productos p ON ci.producto_id = p.id WHERE ci.usuario_id = ?',
-            [userId]
-        );
+        const cartItems = await OrderModel.getCartItemsWithPrices(userId);
 
         for (const item of cartItems) {
             let precioUnitario = item.precio;
@@ -66,10 +64,20 @@ exports.createOrder = async (req, res) => {
         }
 
         // Insertar la orden
-        const [orderResult] = await pool.query(
-            'INSERT INTO ordenes (usuario_id, total, subtotal, impuestos, gasto_envio, metodo_pago, nombre_envio, direccion_envio, ciudad, codigo_postal, telefono, cupon) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [userId, total, subtotal, impuesto, gasto_envio, metodo_pago, nombre_envio, direccion_envio, ciudad, codigo_postal, telefono, cupon]
-        );
+        const orderResult = await OrderModel.createOrder({
+            userId,
+            total,
+            subtotal,
+            impuesto,
+            gasto_envio,
+            metodo_pago,
+            nombre_envio,
+            direccion_envio,
+            ciudad,
+            codigo_postal,
+            telefono,
+            cupon
+        });
         const orderId = orderResult.insertId;
 
         // Insertar los ítems de la orden y actualizar el stock
@@ -80,22 +88,22 @@ exports.createOrder = async (req, res) => {
             }
 
             // Obtener la categoría del producto
-            const [productoInfo] = await pool.query('SELECT nombre, categoria FROM productos WHERE id = ?', [item.producto_id]);
-            const categoria = productoInfo[0].categoria;
+            const productoInfo = await OrderModel.getProductInfo(item.producto_id);
+            const categoria = productoInfo.categoria;
 
-            await pool.query('UPDATE productos SET stock = stock - ? WHERE id = ?', [item.cantidad, item.producto_id]);
-            await pool.query(
-                'INSERT INTO orden_items (orden_id, producto_id, cantidad, precio_unitario, categoria) VALUES (?, ?, ?, ?, ?)',
-                [orderId, item.producto_id, item.cantidad, precioUnitario, categoria]
-            );
+            await OrderModel.updateProductStock(item.producto_id, item.cantidad);
+            await OrderModel.createOrderItem({
+                orderId,
+                productId: item.producto_id,
+                cantidad: item.cantidad,
+                precioUnitario,
+                categoria
+            });
 
-            text += `<li><strong>${item.cantidad}x</strong> ${productoInfo[0].nombre} - <strong>$${precioUnitario}</strong></li>`;
+            text += `<li><strong>${item.cantidad}x</strong> ${productoInfo.nombre} - <strong>$${precioUnitario}</strong></li>`;
         }
         // Vaciar el carrito
-        await pool.query(
-            'DELETE FROM carrito_items WHERE usuario_id = ?',
-            [userId]
-        );
+        await OrderModel.clearUserCart(userId);
 
         const pdfPath = await generarReciboPDF({
             orderId,
@@ -156,8 +164,7 @@ exports.getOxxoDetails = async (_req, res) => {
 
 exports.getVentas = async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT SUM(subtotal) AS total_ventas FROM ordenes');
-        const totalVentas = rows[0].total_ventas;
+        const totalVentas = await OrderModel.getTotalVentas();
         res.json({ totalVentas });
     } catch (error) {
         console.error("Error al obtener las ventas totales:", error);
@@ -167,7 +174,7 @@ exports.getVentas = async (req, res) => {
 
 exports.getVentasPorCategoria = async (req, res) => {
     try {
-        const [rows] = await pool.query(`SELECT categoria, SUM(precio_unitario * cantidad) AS total_ventas FROM orden_items GROUP BY categoria`);
+        const rows = await OrderModel.getVentasPorCategoria();
         res.json(rows);
     } catch (error) {
         console.error("Error al obtener las ventas por categoría:", error);

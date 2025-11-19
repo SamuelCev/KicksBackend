@@ -1,22 +1,20 @@
-const { pool } = require('../services/dbConnection');
+const CartModel = require('../models/CartModel');
+const ProductModel = require('../models/ProductModel');
 
 exports.getCartByUserId = async (req, res) => {
     //const userId  = req.userId;
     const userId = 1; // Temporalmente fijo para pruebas
 
     try {
-        const [rows] = await pool.query('SELECT * FROM carrito_items WHERE usuario_id = ?', [userId]);
+        const rows = await CartModel.getCartItemsByUserId(userId);
 
         for (const row of rows) {
-            const [productRows] = await pool.query('SELECT nombre, precio, stock FROM productos WHERE id = ? AND estado = 1', [row.producto_id]);
-            const [imagenes] = await pool.query(
-                'SELECT url FROM producto_imagenes WHERE producto_id = ? LIMIT 1',
-                [row.producto_id]
-            );
+            const productInfo = await ProductModel.getProductInfo(row.producto_id);
+            const productImage = await ProductModel.getProductFirstImage(row.producto_id);
             
             row.info_producto = {
-                ...productRows[0],
-                imagen: imagenes.length > 0 ? imagenes[0].url : null
+                ...productInfo,
+                imagen: productImage
             };
         }
 
@@ -37,9 +35,7 @@ exports.addItemToCart = async (req, res) => {
         return res.status(400).json({ message: "Los campos productId y cantidad son obligatorios" });
     }
     try {
-        const [result] = await pool.query(
-            'INSERT INTO carrito_items (usuario_id, producto_id, cantidad) VALUES (?, ?, ?)', [userId, productId, cantidad]
-        );
+        const result = await CartModel.addItem(userId, productId, cantidad);
         res.status(201).json({ id: result.insertId, userId, productId, cantidad });
     } catch (error) {
         console.error("Error al agregar el ítem al carrito:", error);
@@ -54,9 +50,7 @@ exports.removeItemFromCart = async (req, res) => {
     const { itemId } = req.params;
     
     try {
-        const [result] = await pool.query(
-            'DELETE FROM carrito_items WHERE id = ? AND usuario_id = ?', [itemId, userId]
-        );
+        const result = await CartModel.removeItem(itemId, userId);
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Ítem no encontrado en el carrito" });
         }
@@ -80,37 +74,28 @@ exports.updateItemQuantity = async (req, res) => {
 
     try {
         // Verificar que el item existe y obtener el producto_id
-        const [items] = await pool.query(
-            'SELECT producto_id FROM carrito_items WHERE id = ? AND usuario_id = ?',
-            [itemId, userId]
-        );
+        const item = await CartModel.getItemById(itemId, userId);
         
-        if (items.length === 0) {
+        if (!item) {
             return res.status(404).json({ message: "Ítem no encontrado en el carrito" });
         }
 
         // Verificar stock disponible
-        const [products] = await pool.query(
-            'SELECT stock FROM productos WHERE id = ? AND estado = 1',
-            [items[0].producto_id]
-        );
+        const product = await ProductModel.getProductStock(item.producto_id);
 
-        if (products.length === 0) {
+        if (!product) {
             return res.status(404).json({ message: "Producto no encontrado" });
         }
 
-        if (cantidad > products[0].stock) {
+        if (cantidad > product.stock) {
             return res.status(400).json({ 
                 message: "Cantidad solicitada excede el stock disponible",
-                stockDisponible: products[0].stock
+                stockDisponible: product.stock
             });
         }
 
         // Actualizar cantidad
-        const [result] = await pool.query(
-            'UPDATE carrito_items SET cantidad = ? WHERE id = ? AND usuario_id = ?',
-            [cantidad, itemId, userId]
-        );
+        const result = await CartModel.updateItemQuantity(itemId, userId, cantidad);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "No se pudo actualizar el ítem" });

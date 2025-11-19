@@ -1,4 +1,5 @@
 const OpenAI = require('openai');
+const AIModel = require('../models/AIModel');
 require('dotenv').config();
 
 const openai = new OpenAI({
@@ -6,121 +7,42 @@ const openai = new OpenAI({
 });
 
 async function searchProducts(params) {
-    const { query, categoria, precioMin, precioMax } = params;
-    
-    let sql = `
-        SELECT 
-            id, 
-            nombre, 
-            marca, 
-            descripcion, 
-            precio, 
-            stock, 
-            categoria, 
-            descuento,
-            hasDescuento,
-            imagen,
-            CASE 
-                WHEN hasDescuento = 1 THEN precio * (1 - descuento)
-                ELSE precio
-            END as precio_final
-        FROM productos 
-        WHERE estado = 1
-    `;
-    const sqlParams = [];
-    
-    if (query) {
-        sql += ' AND (nombre LIKE ? OR marca LIKE ? OR descripcion LIKE ?)';
-        sqlParams.push(`%${query}%`, `%${query}%`, `%${query}%`);
-    }
-    
-    if (categoria) {
-        sql += ' AND categoria = ?';
-        sqlParams.push(categoria);
-    }
-    
-    if (precioMin !== undefined) {
-        sql += ' AND precio >= ?';
-        sqlParams.push(precioMin);
-    }
-    
-    if (precioMax !== undefined) {
-        sql += ' AND precio <= ?';
-        sqlParams.push(precioMax);
-    }
-    
-    sql += ' ORDER BY nombre LIMIT 10';
-    
-    const [productos] = await pool.query(sql, sqlParams);
+    const productos = await AIModel.searchProducts(params);
     return { ok: true, productos };
 }
+
 async function getCategories() {
-    const [categorias] = await pool.query(
-       `SELECT DISTINCT categoria
-        FROM productos
-        WHERE categoria IS NOT NULL AND estado = 1
-        ORDER BY categoria`
-    );
-    return { ok: true, categorias: categorias.map(c => c.categoria) };
+    const categorias = await AIModel.getCategories();
+    return { ok: true, categorias };
 }
+
 async function getBrands() {
-    const [marcas] = await pool.query(
-        `SELECT DISTINCT marca
-        FROM productos
-        WHERE marca IS NOT NULL AND estado = 1
-        ORDER BY marca`
-    );
-    return { ok: true, marcas: marcas.map(m => m.marca) };
+    const marcas = await AIModel.getBrands();
+    return { ok: true, marcas };
 }
+
 async function getProductDetails(params) {
     const { productId } = params;
     
-    const [producto] = await pool.query(
-        `SELECT
-            p.*
-            CASE
-                WHEN p.hasDescuento = 1 THEN p.precio * (1 - p.descuento)
-                ELSE p.precio
-            END as precio_final
-        FROM productos p
-        WHERE p.id = ? AND p.estado = 1`,
-        [productId]
-    );
+    const producto = await AIModel.getProductById(productId);
 
-    if(producto.length === 0) {
+    if (!producto) {
         return { ok: false, message: "Producto no encontrado" };
     }
 
-    const [imagenes] = await pool.query(
-        'SELECT url FROM producto_imagenes WHERE producto_id = ?',
-        [productId] 
-    );
+    const imagenes = await AIModel.getProductImages(productId);
 
     return {
         ok: true,
-        peoducto: {
-            ...producto[0],
-            imagenes_adicionales: imagenes.map(img => img.url)
+        producto: {
+            ...producto,
+            imagenes_adicionales: imagenes
         }
     };
 }
+
 async function getDiscontedProducts() {
-    const [productos] = await pool.query(
-        `SELECT
-            id,
-            nombre,
-            marca,
-            precio,
-            descuento,
-            precio * (1 - descuento) as precio_final,
-            stock,
-            categoria,
-            imagen
-        FROM productos
-        WHERE hasDescuento = 1 AND estado = 1
-        ORDER BY descuento DESC
-        LIMIT 10`
-    );
+    const productos = await AIModel.getDiscountedProducts();
     return { ok: true, productos };
 }
 

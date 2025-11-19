@@ -1,4 +1,4 @@
-const { pool } = require('../services/dbConnection');
+const UserModel = require('../models/UserModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -90,12 +90,9 @@ exports.register = async (req, res) => {
 
     try {
         // Verificar si el email ya está registrado
-        const [existingUser] = await pool.query(
-            'SELECT id FROM usuarios WHERE email = ?',
-            [email]
-        );
+        const emailAlreadyExists = await UserModel.emailExists(email);
 
-        if (existingUser.length > 0) {
+        if (emailAlreadyExists) {
             return res.status(409).json({ message: "El email ya está registrado" });
         }
 
@@ -103,10 +100,13 @@ exports.register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insertar nuevo usuario
-        const [result] = await pool.query(
-            'INSERT INTO usuarios (nombre, email, password, rol, status) VALUES (?, ?, ?, ?, ?)',
-            [nombre, email, hashedPassword, 0, 1] // rol 0 = usuario normal, status 1 = activo
-        );
+        const result = await UserModel.createUser({
+            nombre,
+            email,
+            hashedPassword,
+            rol: 0, // rol 0 = usuario normal
+            status: 1 // status 1 = activo
+        });
 
         res.status(201).json({
             message: "Usuario registrado exitosamente",
@@ -148,12 +148,9 @@ exports.login = async (req, res) => {
 
     try {
         // Buscar usuario por email
-        const [users] = await pool.query(
-            'SELECT id, nombre, email, password, rol, status FROM usuarios WHERE email = ?',
-            [email]
-        );
+        const user = await UserModel.findByEmail(email);
 
-        if (users.length === 0) {
+        if (!user) {
             const attemptData=recordFailedLoginAttempt(email);
             const remainingAttempts=MAX_ATTEMPTS-attemptData.attempts;
             return res.status(401).json({ 
@@ -161,8 +158,6 @@ exports.login = async (req, res) => {
                 remainingAttempts:remainingAttempts>0?remainingAttempts:0
             });
         }
-
-        const user = users[0];
 
         // Verificar si el usuario está activo
         if (user.status === 0) {
@@ -220,16 +215,13 @@ exports.getProfile = async (req, res) => {
     const userId = req.userId; // Viene del middleware de autenticación
 
     try {
-        const [users] = await pool.query(
-            'SELECT id, nombre, email, rol FROM usuarios WHERE id = ? AND status = 1',
-            [userId]
-        );
+        const user = await UserModel.findActiveById(userId);
 
-        if (users.length === 0) {
+        if (!user) {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
-        res.json(users[0]);
+        res.json(user);
     } catch (error) {
         console.error("Error al obtener perfil:", error);
         res.status(500).json({ message: "Error al obtener perfil" });
@@ -255,20 +247,14 @@ exports.updateProfile = async (req, res) => {
 
     try {
         // Verificar si el email ya está en uso por otro usuario
-        const [existingUser] = await pool.query(
-            'SELECT id FROM usuarios WHERE email = ? AND id != ?',
-            [email, userId]
-        );
+        const emailInUse = await UserModel.emailExists(email, userId);
 
-        if (existingUser.length > 0) {
+        if (emailInUse) {
             return res.status(409).json({ message: "El email ya está en uso" });
         }
 
         // Actualizar usuario
-        const [result] = await pool.query(
-            'UPDATE usuarios SET nombre = ?, email = ? WHERE id = ? AND status = 1',
-            [nombre, email, userId]
-        );
+        const result = await UserModel.updateProfile(userId, nombre, email);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Usuario no encontrado" });
@@ -305,17 +291,14 @@ exports.changePassword = async (req, res) => {
 
     try {
         // Obtener usuario
-        const [users] = await pool.query(
-            'SELECT password FROM usuarios WHERE id = ? AND status = 1',
-            [userId]
-        );
+        const user = await UserModel.getPasswordById(userId);
 
-        if (users.length === 0) {
+        if (!user) {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
         // Verificar contraseña actual
-        const isPasswordValid = await bcrypt.compare(currentPassword, users[0].password);
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: "Contraseña actual incorrecta" });
         }
@@ -324,10 +307,7 @@ exports.changePassword = async (req, res) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         // Actualizar contraseña
-        await pool.query(
-            'UPDATE usuarios SET password = ? WHERE id = ?',
-            [hashedPassword, userId]
-        );
+        await UserModel.updatePassword(userId, hashedPassword);
 
         res.json({ message: "Contraseña actualizada exitosamente" });
     } catch (error) {
