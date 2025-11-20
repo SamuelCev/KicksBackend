@@ -182,3 +182,23 @@ exports.getVentasPorCategoria = async (req, res) => {
     }
 }
 
+exports.validarCupon = async (req, res) => {
+    const { cupon } = req.body;
+
+    if (!cupon) {
+        return res.status(400).json({ message: "El código de cupón es obligatorio" });
+    }
+
+    try {
+        let descuento = 0;
+        if (cupon === 'DESCUENTO10') {
+            descuento = 0.10;
+        } else {
+            return res.status(404).json({ message: "Cupón no válido" });
+        }
+        res.json({ cupon, descuento });
+    } catch (error) {
+        console.error("Error al validar el cupón:", error);
+        res.status(500).json({ message: "Error al validar el cupón" });
+    }
+}

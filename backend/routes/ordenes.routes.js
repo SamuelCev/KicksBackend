@@ -1,7 +1,56 @@
 const express = require('express');
-const { createOrder, getPaises, infoTransferencia, getOxxoDetails, getVentas, getVentasPorCategoria } = require('../controllers/ordenes.controllers');
+const { createOrder, getPaises, infoTransferencia, getOxxoDetails, getVentas, getVentasPorCategoria, validarCupon } = require('../controllers/ordenes.controllers');
 const { loginRequired } = require('../middleware/auth.middleware');
 const router = express.Router();
+
+/**
+ * @swagger
+ * /api/ordenes/validar-cupon:
+ *   post:
+ *     summary: Validar cupón de descuento
+ *     description: Verifica si un código de cupón es válido y retorna el porcentaje de descuento aplicable
+ *     tags:
+ *       - Órdenes
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - cupon
+ *             properties:
+ *               cupon:
+ *                 type: string
+ *                 description: Código del cupón a validar
+ *                 example: "DESCUENTO10"
+ *     responses:
+ *       200:
+ *         description: Cupón válido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 cupon:
+ *                   type: string
+ *                   example: "DESCUENTO10"
+ *                 descuento:
+ *                   type: number
+ *                   description: Porcentaje de descuento (0.10 = 10%)
+ *                   example: 0.10
+ *       400:
+ *         description: Código de cupón no proporcionado
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Cupón no válido o expirado
+ *       500:
+ *         description: Error al validar el cupón
+ */
+router.post('/validar-cupon', loginRequired, validarCupon);
 
 /**
  * @swagger
