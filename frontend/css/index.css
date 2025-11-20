@@ -405,11 +405,11 @@
   width: 100%;
   height: auto;
   object-fit: contain;
-  filter: grayscale(100%);
+  filter: brightness(0) saturate(100%) invert(19%) sepia(98%) saturate(6234%) hue-rotate(357deg) brightness(110%) contrast(114%);
   transition: filter 0.3s ease;
 }
 .brand-item:hover .brand-logo {
-  filter: grayscale(0%);
+  filter: brightness(0) saturate(100%) invert(19%) sepia(98%) saturate(6234%) hue-rotate(357deg) brightness(125%) contrast(120%);
 }
 
 /* ============================================
