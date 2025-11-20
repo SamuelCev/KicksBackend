@@ -17,11 +17,6 @@ import { Header } from '../components/header.js';
 import { ThemeBtn } from '../components/theme-btn.js';
 
 // ============================================
-// PROTECCIÓN DE PÁGINA (solo admins)
-// ============================================
-await protectAdminPage();
-
-// ============================================
 // VARIABLES GLOBALES
 // ============================================
 let productosActuales = [];
@@ -505,7 +500,7 @@ async function eliminarProductoHandler(id, nombre) {
         }
         
         mostrarAlertaExito('El producto ha sido eliminado correctamente');
-        cargarProductos();
+        await cargarProductos();
         
     } catch (error) {
         console.error('Error:', error);
@@ -567,17 +562,28 @@ window.removerImagenSeleccionada = removerImagenSeleccionadaHandler;
 // ============================================
 // INICIALIZACIÓN
 // ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    // Renderizar Header al inicio del body
-    const body = document.querySelector('body');
-    body.insertBefore(Header(), body.firstChild);
-    
-    // Renderizar Theme Toggle Button
-    ThemeBtn();
-    
-    // Cargar productos
-    cargarProductos();
-    
-    // Configurar drag and drop
-    setupDragAndDrop();
-});
+async function inicializarPagina() {
+    try {
+        await protectAdminPage();
+
+        // Renderizar Header al inicio del body
+        const body = document.querySelector('body');
+        const header = await Header();
+        body.insertBefore(header, body.firstChild);
+        
+        // Renderizar Theme Toggle Button
+        ThemeBtn();
+        
+        // Cargar productos
+        await cargarProductos();
+        
+        // Configurar drag and drop
+        setupDragAndDrop();
+    } catch (error) {
+        console.error('Error al inicializar página:', error);
+        mostrarAlertaError('Error al cargar la página. Por favor, recarga.');
+    }
+}
+
+// Llamar a la función de inicialización cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', inicializarPagina);

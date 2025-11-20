@@ -1,26 +1,16 @@
-import { getCart, updateCartItem, removeFromCart, protectPage } from '../js/utils/auth.js';
-import { cartIcon } from '../js/utils/icons.js';
-import { API_URL } from './utils/config.js';
-
-await protectPage();
+import { getCart, updateCartItem, removeFromCart, protectPage } from './utils/auth.js';
+import { cartIcon } from './utils/icons.js';
+import { obtenerUrlImagen } from './utils/utilities.js';
 let carritoItems = [];
-
-// Obtener URL completa de la imagen
-function obtenerUrlImagen(imagenPath) {
-    if (!imagenPath) return '';
-    if (/^https?:\/\//i.test(imagenPath)) {
-        return imagenPath;
-    }
-    const baseUrl = API_URL.replace('/api', ''); 
-    return `${baseUrl}${imagenPath}`;
-}
 
 // Cargar carrito de la API y renderizar
 async function cargarCarrito() {
     const container = document.getElementById('cart-content');
     
     try {
+        console.log('Cargando carrito...');
         const resultado = await getCart();
+        console.log('Carrito obtenido:', resultado);
         
         if (resultado.success) {
             carritoItems = resultado.cart;
@@ -232,7 +222,18 @@ window.procederAlCheckout = function() {
     window.location.href = 'pago.html';
 };
 
+async function inicializarPagina() {
+    try {
+        await protectPage();
+        
+        // Cargar productos
+        await cargarCarrito();
+        
+    } catch (error) {
+        console.error('Error al inicializar página:', error);
+        mostrarAlertaError('Error al cargar la página. Por favor, recarga.');
+    }
+}
+
 // Cargar carrito al iniciar
-document.addEventListener('DOMContentLoaded', () => {
-    cargarCarrito();
-});
+document.addEventListener('DOMContentLoaded', inicializarPagina);

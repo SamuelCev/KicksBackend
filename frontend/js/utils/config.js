@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
   ORDERS: {
     BASE: '/ordenes',
     PAISES: '/ordenes/paises',
+    CUPON: '/ordenes/validar-cupon',
     INFO_TRANSFERENCIA: '/ordenes/info-transferencia',
     OXXO_DETAILS: '/ordenes/oxxo-details',
     VENTAS: '/ordenes/ventas',

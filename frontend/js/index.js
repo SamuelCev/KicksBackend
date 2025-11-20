@@ -1,23 +1,25 @@
 import { aiChatIcon, trashIcon } from './utils/icons.js';
 import './utils/chat.js';
+import { getRandomProducts } from './utils/auth.js';
 
 // ============================================
 // CARGAR PRODUCTOS DESTACADOS DESDE EL BACKEND
 // ============================================
 async function loadFeaturedProducts() {
     const productsGrid = document.getElementById('featured-products-grid');
-    
+
     try {
-        // Importar funciones necesarias
-        const { obtenerProductosAleatorios } = await import('./api/productos.js');
         const { renderProductCards } = await import('../components/product-card.js');
-        
+
         // Obtener productos aleatorios del backend (máximo 4)
-        const productos = await obtenerProductosAleatorios();
-        
-        // Renderizar productos usando el componente ProductCard
-        renderProductCards(productos, productsGrid);
-        
+        const response = await getRandomProducts();
+
+        if (response.success) {
+            renderProductCards(response.products, productsGrid);
+        } else {
+            throw new Error(response.error);
+        }
+
     } catch (error) {
         console.error('Error al cargar productos:', error);
         productsGrid.innerHTML = `

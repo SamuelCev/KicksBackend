@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Servir archivos estáticos desde la carpeta uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors({
     origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], 

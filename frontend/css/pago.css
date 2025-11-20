@@ -199,6 +199,16 @@
   margin-bottom: 0;
 }
 
+.form-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+}
+
+#cupon-mensaje {
+    font-weight: 500;
+}
+
 /* ============================================
    RESUMEN DE ORDEN
    ============================================ */
@@ -354,7 +364,7 @@
 
   .order-summary {
     position: static;
-    order: -1;
+    /* El formulario aparecerá primero en el orden natural del HTML */
   }
 
   .checkout-form-section {
