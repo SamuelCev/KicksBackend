@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Servir archivos estáticos desde la carpeta uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors({
     origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], 
@@ -34,7 +34,7 @@ app.use(cors({
     optionsSuccessStatus: 200
 }));
 
-app.get("api/health", (_req, res) => res.json({ ok: true }));
+app.get("/api/health", (_req, res) => res.json({ ok: true }));
 app.use("/api/products", productsRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/ordenes", ordenesRoutes);

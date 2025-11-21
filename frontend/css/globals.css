@@ -55,7 +55,6 @@ GOOGLE FONTS - LEXEND
 html {
   font-size: var(--font-size-base);
 }
-
 body {
   font-family: var(--font-family);
   background-color: var(--color-fondo);
@@ -208,4 +207,148 @@ body.text-extra-large { --font-size-base: 20px; }
     bottom: 15px;
     left: 15px;
   }
+}
+
+/* ============================================
+   LOADING SPINNER GLOBAL
+   ============================================ */
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--color-input-border);
+  border-top: 4px solid var(--color-acento);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ============================================
+   CAPTCHA GLOBAL
+   ============================================ */
+.captcha-container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.captcha-image {
+  flex: 1;
+  height: 60px;
+  border: 2px solid var(--color-input-border);
+  border-radius: 8px;
+  background-color: var(--color-input-bg);
+  object-fit: contain;
+  padding: 4px;
+}
+.btn-refresh-captcha {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background-color: var(--color-acento);
+  color: var(--color-blanco);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+.btn-refresh-captcha:hover {
+  background-color: #b00f0e;
+  transform: rotate(180deg);
+}
+.btn-refresh-captcha:active {
+  transform: rotate(180deg) scale(0.95);
+}
+
+/* ============================================
+   PRODUCT BADGES GLOBALES
+   ============================================ */
+.product-badge--new {
+  background-color: #4CAF50;
+}
+.product-badge--sold-out {
+  background-color: #757575;
+}
+.product-badge--sale {
+  background-color: var(--color-acento);
+}
+
+/* ============================================
+   PRODUCT CART BUTTON STATES
+   ============================================ */
+.product-cart-btn--disabled {
+  background-color: var(--color-gris);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.product-cart-btn--disabled:hover {
+  background-color: var(--color-gris);
+  transform: none;
+}
+.product-cart-btn--added {
+  background-color: #4CAF50;
+  animation: pulse 0.5s ease;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* ============================================
+   STATES GLOBALES (LOADING, ERROR, EMPTY)
+   ============================================ */
+.products-loading,
+.products-error,
+.products-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+}
+.products-loading p,
+.products-error p,
+.products-empty p {
+  color: var(--color-secundario);
+  font-size: 1.1rem;
+}
+.products-error p {
+  margin-bottom: 20px;
+}
+
+/* ============================================
+   FIX PARA AUTOCOMPLETADO DE INPUTS
+   ============================================ */
+
+/* Estilos para todos los inputs con autocompletado */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-fondo) inset !important;
+  -webkit-text-fill-color: var(--color-texto) !important;
+  box-shadow: 0 0 0 1000px var(--color-input-bg) inset !important;
+  border: 2px solid var(--color-input-border) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Para que la transición no afecte otros estilos */
+input:-webkit-autofill::first-line,
+textarea:-webkit-autofill::first-line,
+select:-webkit-autofill::first-line {
+  font-family: var(--font-family) !important;
+  font-size: 1rem !important;
+  color: var(--color-texto) !important;
 }

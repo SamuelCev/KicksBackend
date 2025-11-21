@@ -1,4 +1,4 @@
-import { API_URL, API_ENDPOINTS } from '../api/config.js';
+import { API_URL, API_ENDPOINTS } from './config.js';
 
 // Variable temporal en memoria para el usuario actual
 let currentUser = null;
@@ -334,9 +334,10 @@ export async function getProducts(categoria = null, hasDescuento = null) {
         const response = await peticionAPI(url, 'GET');
         
         if (response.ok) {
-            let productos = response;
+            let productos = response.data || response;
+            
             if (!Array.isArray(productos)) {
-                const keys = Object.keys(productos).filter(k => !['ok', 'status'].includes(k));
+                const keys = Object.keys(productos).filter(k => !['ok', 'status', 'data'].includes(k));
 
                 if (keys.length > 0 && keys.every(k => !isNaN(k))) {
                     productos = keys
@@ -397,22 +398,37 @@ export async function getRandomProducts() {
             API_ENDPOINTS.PRODUCTS.RANDOMS,
             'GET'
         );
-        
+
         if (response.ok) {
-            return { 
-                success: true, 
-                products: response 
+            let productos = response.data || response;
+
+            // Si no es un array, intentar convertirlo (igual que en getProducts)
+            if (!Array.isArray(productos)) {
+                const keys = Object.keys(productos).filter(k => !['ok', 'status', 'data'].includes(k));
+
+                if (keys.length > 0 && keys.every(k => !isNaN(k))) {
+                    productos = keys
+                        .map(k => productos[k])
+                        .filter(v => v && typeof v === 'object');
+                } else {
+                    productos = [];
+                }
+            }
+
+            return {
+                success: true,
+                products: productos
             };
         } else {
-            return { 
-                success: false, 
-                error: response.error || 'Error al obtener productos aleatorios' 
+            return {
+                success: false,
+                error: response.error || 'Error al obtener productos aleatorios'
             };
         }
     } catch(error) {
-        return { 
-            success: false, 
-            error: 'Error de conexión con el servidor' 
+        return {
+            success: false,
+            error: 'Error de conexión con el servidor'
         };
     }
 }
@@ -605,6 +621,30 @@ export async function getCart() {
         };
     }
 }
+export async function countCart() {
+    try {
+        const response = await peticionAPI(
+            API_ENDPOINTS.CART.COUNT,
+            'GET'
+        );
+        if (response.ok) {
+            return { 
+                success: true, 
+                itemCount: response.count 
+            };
+        } else {
+            return { 
+                success: false, 
+                error: response.error || 'Error al contar items del carrito' 
+            };
+        }
+    } catch(error) {
+        return { 
+            success: false, 
+            error: 'Error de conexión con el servidor' 
+        };
+    }
+}
 // Agregar producto al carrito
 export async function addToCart(productId, cantidad) {
     try {
@@ -615,6 +655,7 @@ export async function addToCart(productId, cantidad) {
         );
         
         if (response.ok) {
+            document.dispatchEvent(new CustomEvent('cartUpdated'));
             return { 
                 success: true, 
                 item: response 
@@ -642,6 +683,7 @@ export async function updateCartItem(itemId, cantidad) {
         );
         
         if (response.ok) {
+            document.dispatchEvent(new CustomEvent('cartUpdated'));
             return { 
                 success: true,
                 item: response
@@ -668,6 +710,7 @@ export async function removeFromCart(itemId) {
         );
         
         if (response.ok) {
+            document.dispatchEvent(new CustomEvent('cartUpdated'));
             return { 
                 success: true 
             };
@@ -698,6 +741,7 @@ export async function createOrder(orderData) {
         );
         
         if (response.ok) {
+            document.dispatchEvent(new CustomEvent('cartUpdated'));
             return { 
                 success: true, 
                 orderId: response.orderId 
@@ -715,6 +759,32 @@ export async function createOrder(orderData) {
         };
     }
 }
+// Verificar cupon
+export async function verifyCoupon(codigo) {
+    try {
+        const response = await peticionAPI(
+            API_ENDPOINTS.ORDERS.CUPON,
+            'POST',
+            { cupon: codigo }
+        );
+        if (response.ok) {
+            return { 
+                success: true, 
+                descuento: response.descuento 
+            };
+        } else {
+            return { 
+                success: false, 
+                error: response.message || response.error || 'Cupón inválido'
+            };
+        }
+    } catch(error) {
+        return { 
+            success: false, 
+            error: 'Error de conexión con el servidor' 
+        };
+    }
+}
 // Obtener países disponibles
 export async function getPaises() {
     try {
@@ -723,10 +793,10 @@ export async function getPaises() {
             'GET'
         );
         
-        if (response.ok) {
+        if (response.ok && response.data) {
             return { 
                 success: true, 
-                paises: response 
+                paises: response.data 
             };
         } else {
             return { 
@@ -861,7 +931,7 @@ export async function generateCaptcha() {
             return { 
                 success: true, 
                 captchaId: response.captchaId,
-                image: response.image 
+                image: response.image  
             };
         } else {
             return { 
@@ -1042,11 +1112,19 @@ export async function peticionAPI(endpoint, method = 'GET', body = null, esperaA
                 };
             }
             
-            return {
-                ok: true,
-                status: response.status,
-                ...data
-            };
+            if (Array.isArray(data)) {
+                return {
+                    ok: true,
+                    status: response.status,
+                    data: data  
+                };
+            } else {
+                return {
+                    ok: true,
+                    status: response.status,
+                    ...data
+                };
+            }
         }
         
     } catch (error) {

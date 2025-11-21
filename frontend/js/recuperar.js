@@ -1,14 +1,36 @@
-// ============================================
-// RECUPERAR.JS - Flujo de recuperación de contraseña
-// ============================================
-
-import { resetPasswordEmail, verifyCode, resetPassword } from './utils/auth.js';
+import { resetPasswordEmail, verifyCode, resetPassword, generateCaptcha, validateCaptcha } from './utils/auth.js';
+import { getSwalConfig } from './utils/utilities.js';
 
 // ============================================
 // MANEJO DE ESTADO CON SESSION STORAGE
 // ============================================
-
 const STORAGE_KEY = 'kicks_recovery_state';
+
+let currentCaptchaId = null;
+
+async function loadCaptcha() {
+  const captchaResult = await generateCaptcha();
+  
+  if (captchaResult.success) {
+    currentCaptchaId = captchaResult.captchaId;
+    
+    const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(captchaResult.image)}`;
+    document.getElementById('captcha-image').src = svgDataUrl;
+    
+    document.getElementById('captcha-answer').value = '';
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo cargar el CAPTCHA',
+      ...getSwalConfig()
+    });
+  }
+}
+
+await loadCaptcha();
+
+document.getElementById('refresh-captcha').addEventListener('click', loadCaptcha);
 
 // Estado inicial
 let recoveryState = {
@@ -65,6 +87,7 @@ function clearAllInputs() {
   document.getElementById('code').value = '';
   document.getElementById('new-password').value = '';
   document.getElementById('confirm-password').value = '';
+  document.getElementById('captcha-answer').value = '';
   
   // Remover hints de contraseña si existen
   document.querySelectorAll('.password-hint').forEach(hint => hint.remove());
@@ -94,13 +117,13 @@ function showStep(stepNumber) {
 // ============================================
 // PASO 1: SOLICITAR CÓDIGO
 // ============================================
-
 document.getElementById('form-email').addEventListener('submit', async (e) => {
   e.preventDefault();
   
   const emailInput = document.getElementById('email');
   const email = emailInput.value.trim();
-  
+  const captchaAnswer = document.getElementById('captcha-answer').value.trim(); 
+
   if (!email) {
     await Swal.fire({
       icon: 'error',
@@ -120,7 +143,30 @@ document.getElementById('form-email').addEventListener('submit', async (e) => {
     });
     return;
   }
+
+  if (!captchaAnswer) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'CAPTCHA requerido',
+      text: 'Por favor completa el CAPTCHA',
+      ...getSwalConfig()
+    });
+    return;
+  }
+
+  const captchaResult = await validateCaptcha(currentCaptchaId, captchaAnswer);
   
+  if (!captchaResult.success || !captchaResult.valid) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'CAPTCHA incorrecto',
+      text: 'El código ingresado no es válido',
+      ...getSwalConfig()
+    });
+    await loadCaptcha(); 
+    return;
+  }
+
   // Mostrar loading
   Swal.fire({
     title: 'Enviando código...',
@@ -176,15 +222,16 @@ document.getElementById('form-email').addEventListener('submit', async (e) => {
     await Swal.fire({
       icon: 'error',
       title: 'Error',
-      text: error.message || 'No se pudo enviar el código. Por favor, intenta de nuevo.'
+      text: error.message || 'No se pudo enviar el código. Por favor, intenta de nuevo.',
+      ...getSwalConfig()
     });
+    await loadCaptcha();
   }
 });
 
 // ============================================
 // PASO 2: VERIFICAR CÓDIGO
 // ============================================
-
 document.getElementById('form-code').addEventListener('submit', async (e) => {
   e.preventDefault();
   

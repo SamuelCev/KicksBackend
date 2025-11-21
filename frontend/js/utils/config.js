@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
   // Carrito
   CART: {
     BASE: '/cart',
+    COUNT: '/cart/count',    
     DELETE_ITEM: (itemId) => `/cart/${itemId}`,
     UPDATE_ITEM: (itemId) => `/cart/${itemId}`,
   },
@@ -34,6 +35,7 @@ export const API_ENDPOINTS = {
   ORDERS: {
     BASE: '/ordenes',
     PAISES: '/ordenes/paises',
+    CUPON: '/ordenes/validar-cupon',
     INFO_TRANSFERENCIA: '/ordenes/info-transferencia',
     OXXO_DETAILS: '/ordenes/oxxo-details',
     VENTAS: '/ordenes/ventas',

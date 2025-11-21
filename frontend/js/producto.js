@@ -1,25 +1,19 @@
-import { API_URL } from './api/config.js';
-import { agregarAlCarrito } from './api/carrito.js';
 import { cartIcon } from './utils/icons.js';
-import { getSwalConfig } from './utils/utilities.js';
+import { getProductByID, addToCart, getCart } from './utils/auth.js';
+import { obtenerUrlImagen, mostrarNotificacion } from './utils/utilities.js';
 
-const BACKEND_URL = 'http://localhost:3000';
 let currentProduct = null;
 let currentQuantity = 1;
 let currentImages = [];
 let currentImageIndex = 0;
 
-/**
- * Obtener URL completa de la imagen
- */
-function obtenerUrlImagen(imagenPath) {
+// Obtener ID del producto desde la URL
+function getProductIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
     return params.get('id');
 }
 
-/**
- * Cargar producto desde la API
- */
+// Cargar producto desde la API
 async function cargarProducto() {
     const productId = getProductIdFromUrl();
     
@@ -32,13 +26,14 @@ async function cargarProducto() {
     const content = document.getElementById('product-content');
     
     try {
-        const response = await fetch(`${API_URL}/products/${productId}`);
+        // Usar función de auth.js en lugar de fetch directo
+        const response = await getProductByID(productId);
         
-        if (!response.ok) {
-            throw new Error('Producto no encontrado');
+        if (!response.success) {
+            throw new Error(response.error || 'Producto no encontrado');
         }
         
-        currentProduct = await response.json();
+        currentProduct = response.product;
         
         // Preparar array de imágenes
         currentImages = [];
@@ -53,7 +48,6 @@ async function cargarProducto() {
         content.style.display = 'block';
         
         renderizarProducto();
-        cargarProductosRelacionados();
         
     } catch (error) {
         console.error('Error al cargar producto:', error);
@@ -62,9 +56,7 @@ async function cargarProducto() {
     }
 }
 
-/**
- * Renderizar producto en la página
- */
+// Renderizar producto en la página
 function renderizarProducto() {
     const content = document.getElementById('product-content');
     
@@ -164,9 +156,7 @@ function renderizarProducto() {
     setupEventListeners();
 }
 
-/**
- * Configurar event listeners
- */
+// Configurar event listeners
 function setupEventListeners() {
     // Thumbnails
     const thumbnails = document.querySelectorAll('.thumbnail');
@@ -206,9 +196,7 @@ function setupEventListeners() {
     }
 }
 
-/**
- * Cambiar imagen principal
- */
+// Cambiar imagen principal
 function cambiarImagen(index) {
     currentImageIndex = index;
     const mainImage = document.querySelector('#main-image img');
@@ -220,9 +208,7 @@ function cambiarImagen(index) {
     });
 }
 
-/**
- * Actualizar cantidad en la UI
- */
+// Actualizar cantidad en la UI
 function actualizarCantidad() {
     const quantityValue = document.getElementById('quantity-value');
     const btnDecrease = document.getElementById('btn-decrease');
@@ -233,75 +219,68 @@ function actualizarCantidad() {
     btnIncrease.disabled = currentQuantity >= currentProduct.stock;
 }
 
-/**
- * Agregar producto al carrito
- */
+// Agregar producto al carrito usando auth.js
 async function agregarAlCarritoHandler() {
     if (!currentProduct || currentProduct.stock === 0) return;
     
     const btnAddCart = document.getElementById('btn-add-cart');
+    const originalContent = btnAddCart.innerHTML;
     btnAddCart.disabled = true;
     btnAddCart.innerHTML = '<span>Agregando...</span>';
     
     try {
-        await agregarAlCarrito(currentProduct.id, currentQuantity, currentProduct.nombre);
+        const response = await addToCart(currentProduct.id, currentQuantity);
         
-        // Restaurar botón
-        btnAddCart.disabled = false;
-        btnAddCart.innerHTML = `${cartIcon}<span>Agregar al Carrito</span>`;
-        
-        // Resetear cantidad
-        currentQuantity = 1;
-        actualizarCantidad();
+        if (response.success) {
+            // Mostrar mensaje de éxito
+            mostrarNotificacion('Producto agregado al carrito', 'success');
+            
+            // Resetear cantidad
+            currentQuantity = 1;
+            actualizarCantidad();
+            
+            // Actualizar contador del carrito si existe
+            actualizarContadorCarrito();
+        } else {
+             if (response.error === 'No autorizado. Falta el token.' || 
+                response.error?.includes('No autorizado') ||
+                response.error?.includes('token')) {
+                window.location.href = '../cuenta/login.html';
+                return;
+            }
+            // Mostrar error para otros casos
+            mostrarNotificacion(response.error || 'Error al agregar al carrito', 'error');
+        }
         
     } catch (error) {
         console.error('Error al agregar al carrito:', error);
+        mostrarNotificacion('Error al agregar al carrito', 'error');
+    } finally {
+        // Restaurar botón
         btnAddCart.disabled = false;
-        btnAddCart.innerHTML = `${cartIcon}<span>Agregar al Carrito</span>`;
+        btnAddCart.innerHTML = originalContent;
     }
 }
 
-/**
- * Cargar productos relacionados (misma categoría)
- */
-async function cargarProductosRelacionados() {
-    const grid = document.getElementById('related-grid');
-    
+// Actualizar contador del carrito en el header
+async function actualizarContadorCarrito() {
     try {
-        const response = await fetch(`${API_URL}/products/stock/categoria/${currentProduct.categoria}`);
+        const response = await getCart();
         
-        if (!response.ok) throw new Error('Error al cargar productos relacionados');
-        
-        let productos = await response.json();
-        
-        // Filtrar el producto actual y limitar a 4
-        productos = productos
-            .filter(p => p.id !== currentProduct.id)
-            .slice(0, 4);
-        
-        if (productos.length === 0) {
-            grid.innerHTML = '<p style="text-align: center; color: var(--color-secundario);">No hay productos relacionados</p>';
-            return;
+        if (response.success) {
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                const totalItems = response.cart.reduce((sum, item) => sum + item.cantidad, 0);
+                cartCount.textContent = totalItems;
+                cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+            }
         }
-        
-        // Importar y renderizar product cards
-        const { ProductCard } = await import('../components/product-card.js');
-        
-        grid.innerHTML = '';
-        productos.forEach(producto => {
-            const card = ProductCard(producto);
-            grid.appendChild(card);
-        });
-        
     } catch (error) {
-        console.error('Error al cargar productos relacionados:', error);
-        grid.innerHTML = '<p style="text-align: center; color: var(--color-secundario);">Error al cargar productos</p>';
+        console.error('Error al actualizar contador del carrito:', error);
     }
 }
 
-/**
- * Mostrar error
- */
+// Mostrar error
 function mostrarError(mensaje) {
     const content = document.getElementById('product-content');
     content.style.display = 'block';
@@ -314,9 +293,37 @@ function mostrarError(mensaje) {
     `;
 }
 
-/**
- * Inicializar
- */
+// Inicializar
 document.addEventListener('DOMContentLoaded', () => {
     cargarProducto();
+    
+    // Agregar estilos para las animaciones de notificaciones
+    if (!document.querySelector('#notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 });

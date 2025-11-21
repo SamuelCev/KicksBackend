@@ -15,21 +15,6 @@
   padding: 100px 20px;
 }
 
-.loading-spinner {
-  width: 60px;
-  height: 60px;
-  border: 5px solid var(--color-input-border);
-  border-top: 5px solid var(--color-acento);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 /* Product Content */
 .product-content {
   display: grid;

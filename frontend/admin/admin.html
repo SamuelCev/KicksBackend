@@ -13,6 +13,7 @@
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
   <!-- Script para aplicar tema antes del render -->
   <script>
@@ -27,13 +28,75 @@
 <body>
   <!-- Header y Theme Toggle serán inyectados por JS -->
 
+  <!-- Dashboard de Ventas -->
+  <div class="dashboard-section">
+      <!-- Cards de métricas -->
+      <div class="metrics-cards">
+        <div class="metric-card metric-card-primary">
+          <div class="metric-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <div class="metric-content">
+            <p class="metric-label">Total de Ventas</p>
+            <h3 class="metric-value" id="total-ventas">$0.00</h3>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+          </div>
+          <div class="metric-content">
+            <p class="metric-label">Categoría Líder</p>
+            <h3 class="metric-value" id="mejor-categoria">-</h3>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="metric-content">
+            <p class="metric-label">Necesita Atención</p>
+            <h3 class="metric-value" id="peor-categoria">-</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráficas -->
+      <div class="charts-container">
+        <div class="chart-card">
+          <h3 class="chart-title">Distribución de Ventas</h3>
+          <div class="chart-wrapper">
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h3 class="chart-title">Comparación por Categoría</h3>
+          <div class="chart-wrapper">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+      </div>
+  </div>
+
   <div class="admin-container">
-    <div class="admin-header">
-      <h1>Administrador de Productos</h1>
-      <button class="btn btn-primary" onclick="openCreateModal()">
-        Nuevo Producto
-      </button>
-    </div>
+      <div class="admin-header">
+        <h1>Administrador de Productos</h1>
+        <button class="btn btn-primary" onclick="openCreateModal()">
+          Nuevo Producto
+        </button>
+      </div>
 
     <div class="products-section">
       <div class="section-header">

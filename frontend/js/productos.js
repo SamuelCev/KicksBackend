@@ -3,8 +3,8 @@
 // ============================================
 import { renderProductCards } from '../components/product-card.js';
 import { getProducts } from './utils/auth.js';
-import { API_URL } from './api/config.js';
 import { aiChatIcon, trashIcon } from './utils/icons.js';
+import { obtenerUrlImagen } from './utils/utilities.js';
 import '../js/utils/chat.js'
 
 // ============================================
@@ -27,19 +27,7 @@ const resultsCount = document.getElementById('results-count');
 // ============================================
 // FUNCIONES AUXILIARES
 // ============================================
-
-/**
- * Obtener URL completa de la imagen
- */
-function obtenerUrlImagen(imagenPath) {
-    if (!imagenPath) return null;
-    if (imagenPath.startsWith('http')) return imagenPath;
-    return `${API_URL}${imagenPath}`;
-}
-
-/**
- * Procesar productos para agregar URL completa de imagen
- */
+// Procesar productos para agregar URL completa de imagen
 function procesarProductos(productos) {
     return productos.map(producto => ({
         ...producto,
@@ -50,7 +38,6 @@ function procesarProductos(productos) {
 // ============================================
 // CARGAR PRODUCTOS INICIALES
 // ============================================
-
 async function cargarProductos() {
     try {
         // Mostrar loading
@@ -118,9 +105,7 @@ async function cargarProductos() {
     }
 }
 
-/**
- * Actualizar URL sin recargar la página
- */
+// Actualizar URL sin recargar la página
 function actualizarURL(urlParams) {
     const nuevaUrl = urlParams.toString() 
         ? `${window.location.pathname}?${urlParams.toString()}`
@@ -132,7 +117,6 @@ function actualizarURL(urlParams) {
 // ============================================
 // APLICAR FILTROS
 // ============================================
-
 function aplicarFiltros() {
     const searchTerm = searchInput.value.toLowerCase().trim();
     const selectedCategory = categoryFilter.value.toLowerCase();
@@ -166,7 +150,6 @@ function aplicarFiltros() {
 // ============================================
 // RENDERIZAR PRODUCTOS
 // ============================================
-
 function renderizarProductos() {
     // Actualizar contador de resultados
     actualizarContador();
@@ -195,7 +178,6 @@ function renderizarProductos() {
 // ============================================
 // ACTUALIZAR CONTADOR DE RESULTADOS
 // ============================================
-
 function actualizarContador() {
     const total = todosLosProductos.length;
     const mostrados = productosFiltrados.length;
@@ -210,7 +192,6 @@ function actualizarContador() {
 // ============================================
 // LIMPIAR FILTROS
 // ============================================
-
 function limpiarFiltros() {
     searchInput.value = '';
     categoryFilter.value = '';
@@ -227,7 +208,6 @@ function limpiarFiltros() {
 // ============================================
 // EVENT LISTENERS
 // ============================================
-
 function inicializarEventListeners() {
     // Búsqueda con debounce
     let searchTimeout;
@@ -249,7 +229,6 @@ function inicializarEventListeners() {
 // ============================================
 // INICIALIZACIÓN
 // ============================================
-
 document.addEventListener('DOMContentLoaded', () => {
     inicializarEventListeners();
     cargarProductos();
@@ -257,9 +236,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Exponer función para el botón de reintentar
 window.recargarProductos = cargarProductos;
-
-// ============================================
-// EXPORTAR FUNCIONES AUXILIARES (si se necesitan en otros archivos)
-// ============================================
-
-export { obtenerUrlImagen, procesarProductos };

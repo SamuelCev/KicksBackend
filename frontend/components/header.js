@@ -1,5 +1,5 @@
-import { cartIcon, userIcon, menuIcon, closeIcon } from '../js/utils/icons.js';
-import { isAuthenticated, logout, isAdmin } from '../js/utils/auth.js';
+import { cartIcon, userIcon, menuIcon, closeIcon, adminIcon } from '../js/utils/icons.js';
+import { isAuthenticated, logout, isAdmin, countCart } from '../js/utils/auth.js';
 
 /**
  * Detecta la ruta base según la ubicación del archivo
@@ -22,6 +22,9 @@ export async function Header() {
   const isLoggedIn = await isAuthenticated();
   const isAdminUser = await isAdmin();
   const basePath = getBasePath();
+  const cartCount = await countCart();
+  const cartItemCount = cartCount.success ? cartCount.itemCount : 0;
+  const displayCount = cartItemCount > 99 ? '99+' : cartItemCount;
   
   // Detectar tema actual
   const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
@@ -52,14 +55,12 @@ export async function Header() {
         ${isLoggedIn ? `
           ${isAdminUser ? `
             <a href="${basePath}admin/admin.html" class="navbar-icon-btn btn-admin" aria-lanel="Admin Panel" title="Panel de Administrador">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
+              ${ adminIcon }
             </a>
           ` : ''}
-          <a href="${basePath}tienda/carrito.html" class="navbar-icon-btn" aria-label="Carrito">
+          <a href="${basePath}tienda/carrito.html" class="navbar-icon-btn cart-link" aria-label="Carrito">
             ${cartIcon}
+            ${cartItemCount > 0 ? `<span class="cart-badge">${cartItemCount}</span>` : ''}
           </a>
           <button class="navbar-icon-btn" aria-label="Cuenta">
             ${userIcon}
@@ -95,24 +96,28 @@ export async function Header() {
           ${isAdminUser ? `
             <li>
               <a href="${basePath}admin/admin.html" class="mobile-nav-link mobile-nav-icon" aria-label="Admin">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
+                ${adminIcon}
                 <span>Panel Admin</span>
               </a>
             </li>
           ` : ''}
           <li>
-            <a href="${basePath}tienda/carrito.html" class="mobile-nav-link mobile-nav-icon" aria-label="Carrito">
-              ${cartIcon}
+            <a href="${basePath}tienda/carrito.html" class="mobile-nav-link mobile-nav-icon cart-link" aria-label="Carrito">
+              <div style="position: relative; display: inline-flex;">
+                ${cartIcon}
+                ${cartItemCount > 0 ? `<span class="cart-badge">${displayCount}</span>` : ''}
+              </div>
               <span>Carrito</span>
             </a>
           </li>
           <li>
-            <button class="mobile-nav-link mobile-nav-icon" aria-label="Cuenta">
-              ${userIcon}
-              <span>Cuenta</span>
+            <button class="mobile-nav-link mobile-nav-icon" aria-label="Cerrar sesión" data-action="logout" id="mobile-logout-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Cerrar sesión</span>
             </button>
           </li>
         ` : `
@@ -139,6 +144,26 @@ export async function Header() {
   
   // Agregar listener para cambio de tema
   setupThemeObserver(header, basePath);
+
+  async function updateCartBadge() {
+    const cartCount = await countCart();
+    const cartItemCount = cartCount.success ? cartCount.itemCount : 0;
+    const displayCount = cartItemCount > 99 ? '99+' : cartItemCount;
+    
+    const badges = header.querySelectorAll('.cart-badge');
+    badges.forEach(badge => {
+      badge.textContent = displayCount;
+    });
+    
+    if (cartItemCount === 0) {
+      badges.forEach(badge => badge.style.display = 'none');
+    } else {
+      badges.forEach(badge => badge.style.display = 'flex');
+    }
+  }
+  
+  // Evento custom
+  document.addEventListener('cartUpdated', updateCartBadge);
   
   return header;
 }
@@ -192,6 +217,28 @@ function addHeaderStyles() {
       height: 50px;
       width: auto;
       object-fit: contain;
+    }
+
+    .cart-link {
+      position: relative; /* Importante para el badge */
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: var(--color-acento);
+      color: white;
+      border-radius: 10px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      pointer-events: none; /* El badge no interfiere con clics */
     }
     
     /* Navegación central */
@@ -561,28 +608,38 @@ function setupUserMenu(header) {
     });
   }
 
-  // Comportamiento en móvil (agregar opciones al menú móvil)
-  if (userBtnMobile) {
-    userBtnMobile.addEventListener('click', () => {
-      // Crear un menú temporal en móvil
-      const mobileUserOptions = document.createElement('div');
-      mobileUserOptions.className = 'mobile-user-options';
-      mobileUserOptions.innerHTML = userMenu.innerHTML;
-      
-      // Insertar después del botón de usuario en móvil
-      userBtnMobile.parentElement.insertAdjacentElement('afterend', mobileUserOptions);
-      
-      // Agregar event listeners a las opciones móviles
-      setupMenuActions(mobileUserOptions);
-    });
-  }
-
   // Cerrar menú al hacer clic fuera
   document.addEventListener('click', (e) => {
     if (!userMenu.contains(e.target) && !userBtnDesktop?.contains(e.target)) {
       userMenu.classList.remove('active');
     }
   });
+  // Event listener para logout en móvil
+  const mobileLogoutBtn = header.querySelector('#mobile-logout-btn');
+  if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener('click', async () => {
+      const result = await Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: '¿Estás seguro de que deseas cerrar sesión?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, cerrar sesión',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+        customClass: {
+          popup: 'swal2-popup',
+          title: 'swal2-title',
+          htmlContainer: 'swal2-html-container',
+          confirmButton: 'swal2-confirm',
+          cancelButton: 'swal2-cancel'
+        }
+      });
+      
+      if (result.isConfirmed) {
+        await logout();
+      }
+    });
+  }
 
   // Event listeners para las acciones del menú
   setupMenuActions(userMenu);

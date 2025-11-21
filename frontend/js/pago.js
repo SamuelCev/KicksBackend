@@ -1,13 +1,13 @@
-import { getSwalConfig } from './utils/utilities.js';
+import { getSwalConfig, obtenerUrlImagen } from './utils/utilities.js';
 import { 
     getCart, 
     getPaises, 
     getOxxoDetails, 
     getInfoTransferencia,
     createOrder,
-    protectPage
+    protectPage,
+    verifyCoupon
 } from './utils/auth.js';
-import { API_URL } from './api/config.js';
 
 // ============================================
 // Variables Globales
@@ -15,25 +15,9 @@ import { API_URL } from './api/config.js';
 let carritoItems = [];
 let paisesDisponibles = [];
 let paisSeleccionado = null;
-await protectPage();
+let cuponAplicado = null;
+let descuentoCupon = 0;
 
-
-// ============================================
-// Funciones de Utilidad
-// ============================================
-
-/**
- * Obtener URL completa de la imagen
- */
-function obtenerUrlImagen(imagenPath) {
-    if (!imagenPath) return '../assets/images/placeholder.png';
-    
-    // Si ya es una URL completa, retornarla
-    if (imagenPath.startsWith('http')) return imagenPath;
-    
-    // Si es una ruta relativa, construir URL completa
-    return `${API_URL}/uploads/${imagenPath}`;
-}
 
 // ============================================
 // Funciones de Carga de Datos
@@ -154,11 +138,39 @@ function calcularTotales() {
         impuestos = subtotal * (parseFloat(paisSeleccionado.impuesto) || 0);
     }
     
-    const total = subtotal + envio + impuestos;
+    const descuento = subtotal * descuentoCupon;
+    const subtotalConDescuento = subtotal - descuento;
+    
+    impuestos = subtotalConDescuento * (parseFloat(paisSeleccionado?.impuesto) || 0);
+    
+    const total = subtotalConDescuento + envio + impuestos;
     
     document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
     document.getElementById('envio').textContent = `$${envio.toFixed(2)}`;
     document.getElementById('impuestos').textContent = `$${impuestos.toFixed(2)}`;
+    
+    const summaryDetails = document.querySelector('.summary-details');
+    let descuentoRow = document.getElementById('descuento-row');
+    
+    if (descuentoCupon > 0) {
+        if (!descuentoRow) {
+            descuentoRow = document.createElement('div');
+            descuentoRow.id = 'descuento-row';
+            descuentoRow.className = 'summary-row';
+            descuentoRow.style.color = '#4CAF50';
+            
+            // Insertar antes de la fila de total
+            const totalRow = summaryDetails.querySelector('.summary-row.total');
+            summaryDetails.insertBefore(descuentoRow, totalRow);
+        }
+        descuentoRow.innerHTML = `
+            <span>Descuento (${cuponAplicado})</span>
+            <span>-$${descuento.toFixed(2)}</span>
+        `;
+    } else if (descuentoRow) {
+        descuentoRow.remove();
+    }
+    
     document.getElementById('total').textContent = `$${total.toFixed(2)}`;
 }
 
@@ -441,6 +453,62 @@ async function mostrarConfirmacionTarjeta(orderId) {
     window.location.href = 'productos.html';
 }
 
+// Validar y aplicar cupon de descuento
+async function validarCupon() {
+    const inputCupon = document.getElementById('cupon');
+    const codigoCupon = inputCupon.value.trim().toUpperCase();
+    const mensaje = document.getElementById('cupon-mensaje');
+    const btn = document.getElementById('btn-validar-cupon');
+
+    if (!codigoCupon) {
+        mensaje.style.color = 'var(--color-rojo)';
+        mensaje.textContent = 'Ingresa un codigo de cupon';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Validando...';
+    mensaje.textContent = '';
+
+    try {
+        const result = await verifyCoupon(codigoCupon);
+
+        if (result.success && result.descuento) {
+            cuponAplicado = codigoCupon;
+            descuentoCupon = parseFloat(result.descuento);
+
+            mensaje.style.color = '#4CAF50';
+            mensaje.textContent = `✓ Cupón aplicado: ${(descuentoCupon * 100).toFixed(0)}% de descuento`;
+
+            btn.textContent = 'Aplicado';
+            inputCupon.disabled = true;
+
+            calcularTotales();
+
+            Swal.fire({
+                icon: 'success',
+                title: '¡Cupón aplicado!',
+                text: `Has obtenido ${(descuentoCupon * 100).toFixed(0)}% de descuento`,
+                timer: 2000,
+                showConfirmButton: false,
+                ...getSwalConfig()
+            });
+        } else {
+            throw new Error(result.error || 'Cupon Invalido');
+        }
+    } catch (error) {
+        mensaje.style.color = 'var(--color-error)';
+        mensaje.textContent = `✗ ${error.message}`;
+        
+        btn.disabled = false;
+        btn.textContent = 'Aplicar';
+        
+        cuponAplicado = null;
+        descuentoCupon = 0;
+        calcularTotales();
+    }
+}
+
 // ============================================
 // Inicialización
 // ============================================
@@ -450,6 +518,7 @@ async function mostrarConfirmacionTarjeta(orderId) {
  */
 document.addEventListener('DOMContentLoaded', async () => {
     // Cargar datos iniciales
+    await protectPage();
     await cargarPaises();
     await cargarCarrito();
     
@@ -487,5 +556,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnConfirmar = document.getElementById('btn-confirmar-pago');
     if (btnConfirmar) {
         btnConfirmar.addEventListener('click', confirmarPedido);
+    }
+
+    const btnValidarCupon = document.getElementById('btn-validar-cupon');
+    if (btnValidarCupon) {
+        btnValidarCupon.addEventListener('click', validarCupon);
+    }
+    
+    const inputCupon = document.getElementById('cupon');
+    if (inputCupon) {
+        inputCupon.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                validarCupon();
+            }
+        });
     }
 });

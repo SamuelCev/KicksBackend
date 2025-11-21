@@ -1,8 +1,5 @@
-// ============================================
-// IMPORTS
-// ============================================
 import { getSwalConfig } from './utils/utilities.js';
-import { API_URL } from './api/config.js';
+import { API_URL } from './utils/config.js';
 import { 
     getProducts,
     getProductByID,
@@ -11,15 +8,12 @@ import {
     deleteProduct,
     addProductImages,
     deleteProductImage,
-    protectAdminPage
+    protectAdminPage,
+    getVentas,
+    getVentasPorCategoria
 } from './utils/auth.js';
 import { Header } from '../components/header.js';
 import { ThemeBtn } from '../components/theme-btn.js';
-
-// ============================================
-// PROTECCIÓN DE PÁGINA (solo admins)
-// ============================================
-await protectAdminPage();
 
 // ============================================
 // VARIABLES GLOBALES
@@ -134,6 +128,7 @@ function renderizarTablaProductos(productos) {
         return;
     }
     
+    // Generar tabla (para desktop)
     const tabla = `
         <table class="products-table">
             <thead>
@@ -191,7 +186,67 @@ function renderizarTablaProductos(productos) {
         </table>
     `;
     
-    container.innerHTML = tabla;
+    // Generar cards (para móvil)
+    const cards = productos.map(producto => `
+        <div class="product-card">
+            <div class="product-card-header">
+                <div class="product-card-image">
+                    ${producto.imagen 
+                        ? `<img src="${obtenerUrlImagen(producto.imagen)}" alt="${producto.nombre}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23ddd%22 width=%22100%22 height=%22100%22/></svg>'">` 
+                        : '<div style="width: 100%; height: 100%; background: var(--color-input-bg); display: flex; align-items: center; justify-content: center; color: var(--color-gris);">Sin imagen</div>'
+                    }
+                </div>
+                <div class="product-card-title">
+                    <h3>${producto.nombre}</h3>
+                    <p>${producto.marca || 'Sin marca'}</p>
+                </div>
+            </div>
+            
+            <div class="product-card-body">
+                <div class="product-card-item">
+                    <span class="product-card-label">Categoría</span>
+                    <span class="product-card-value">${producto.categoria}</span>
+                </div>
+                <div class="product-card-item">
+                    <span class="product-card-label">Precio</span>
+                    <span class="product-card-value">$${parseFloat(producto.precio).toFixed(2)}</span>
+                </div>
+                <div class="product-card-item">
+                    <span class="product-card-label">Stock</span>
+                    <span class="product-card-value">${producto.stock}</span>
+                </div>
+                <div class="product-card-item">
+                    <span class="product-card-label">Descuento</span>
+                    <span class="product-card-value">
+                        ${producto.hasDescuento === 1 
+                            ? `<span class="badge badge-warning">${(parseFloat(producto.descuento) * 100).toFixed(0)}%</span>` 
+                            : '-'
+                        }
+                    </span>
+                </div>
+                <div class="product-card-item">
+                    <span class="product-card-label">Estado</span>
+                    <span class="product-card-value">
+                        ${producto.estado === 1 
+                            ? '<span class="badge badge-success">Activo</span>' 
+                            : '<span class="badge badge-danger">Inactivo</span>'
+                        }
+                    </span>
+                </div>
+            </div>
+            
+            <div class="product-card-footer">
+                <button class="btn btn-primary btn-small" onclick="openEditModal(${producto.id})">
+                    Editar
+                </button>
+                <button class="btn btn-danger btn-small" onclick="deleteProduct(${producto.id}, '${producto.nombre.replace(/'/g, "\\'")}')">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = tabla + `<div class="products-cards">${cards}</div>`;
 }
 
 // ============================================
@@ -266,7 +321,7 @@ function renderizarImagenesExistentes() {
     
     container.innerHTML = imagenesExistentes.map((imagen, index) => `
         <div class="image-preview-item" data-image-id="${imagen.id}">
-            <img src="${obtenerUrlImagen(imagen.url)}" alt="Imagen ${index + 1}">
+            <img src="${obtenerUrlImagen(imagen.url_imagen)}" alt="Imagen ${index + 1}">
             <button type="button" class="remove-image" onclick="eliminarImagenExistente(${imagen.id})" title="Eliminar imagen">
                 X
             </button>
@@ -505,7 +560,7 @@ async function eliminarProductoHandler(id, nombre) {
         }
         
         mostrarAlertaExito('El producto ha sido eliminado correctamente');
-        cargarProductos();
+        await cargarProductos();
         
     } catch (error) {
         console.error('Error:', error);
@@ -552,6 +607,295 @@ function setupDragAndDrop() {
 }
 
 // ============================================
+// DASHBOARD Y ESTADÍSTICAS
+// ============================================
+
+let pieChartInstance = null;
+let barChartInstance = null;
+
+async function cargarEstadisticas() {
+    try {
+        // Obtener datos del backend
+        const [ventasResult, ventasPorCategoriaResult] = await Promise.all([
+            getVentas(),
+            getVentasPorCategoria()
+        ]);
+
+        if (!ventasResult.success || !ventasPorCategoriaResult.success) {
+            throw new Error('Error al cargar estadísticas');
+        }
+
+        const totalVentas = ventasResult.totalVentas || 0;
+        
+        let ventasPorCategoria = [];
+        if (ventasPorCategoriaResult.ventas) {
+            // Si viene en .ventas
+            if (Array.isArray(ventasPorCategoriaResult.ventas)) {
+                ventasPorCategoria = ventasPorCategoriaResult.ventas;
+            } else if (ventasPorCategoriaResult.ventas.data && Array.isArray(ventasPorCategoriaResult.ventas.data)) {
+                // Si viene en .ventas.data
+                ventasPorCategoria = ventasPorCategoriaResult.ventas.data;
+            } else if (typeof ventasPorCategoriaResult.ventas === 'object') {
+                // Si es un objeto, intentar convertirlo a array
+                const keys = Object.keys(ventasPorCategoriaResult.ventas).filter(k => !isNaN(k));
+                if (keys.length > 0) {
+                    ventasPorCategoria = keys.map(k => ventasPorCategoriaResult.ventas[k]);
+                }
+            }
+        }
+
+        console.log('Total Ventas:', totalVentas);
+        console.log('Ventas por Categoría:', ventasPorCategoria);
+
+        // Actualizar cards
+        actualizarCards(totalVentas, ventasPorCategoria);
+
+        // Crear gráficas
+        crearGraficas(ventasPorCategoria);
+
+    } catch (error) {
+        console.error('Error al cargar estadísticas:', error);
+        document.getElementById('total-ventas').textContent = 'Error';
+        document.getElementById('mejor-categoria').textContent = '-';
+        document.getElementById('peor-categoria').textContent = '-';
+    }
+}
+
+function actualizarCards(totalVentas, ventasPorCategoria) {
+    // Total de ventas
+    const total = totalVentas || 0;
+    document.getElementById('total-ventas').textContent = 
+        `$${total.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    // Validar que ventasPorCategoria sea un array
+    if (!Array.isArray(ventasPorCategoria) || ventasPorCategoria.length === 0) {
+        document.getElementById('mejor-categoria').textContent = 'Sin datos';
+        document.getElementById('peor-categoria').textContent = 'Sin datos';
+        return;
+    }
+
+    // Ordenar por ventas
+    const ordenadas = [...ventasPorCategoria].sort((a, b) => 
+        parseFloat(b.total_ventas || 0) - parseFloat(a.total_ventas || 0)
+    );
+
+    // Mejor categoría
+    const mejor = ordenadas[0];
+    document.getElementById('mejor-categoria').textContent = 
+        capitalizarCategoria(mejor.categoria);
+
+    // Peor categoría
+    const peor = ordenadas[ordenadas.length - 1];
+    document.getElementById('peor-categoria').textContent = 
+        capitalizarCategoria(peor.categoria);
+}
+
+function crearGraficas(ventasPorCategoria) {
+    if (ventasPorCategoria.length === 0) {
+        mostrarMensajeSinDatos('pieChart');
+        mostrarMensajeSinDatos('barChart');
+        return;
+    }
+
+    // Preparar datos
+    const labels = ventasPorCategoria.map(item => capitalizarCategoria(item.categoria));
+    const data = ventasPorCategoria.map(item => parseFloat(item.total_ventas));
+    const colores = obtenerColoresPorCategoria(ventasPorCategoria);
+
+    // Crear Pie Chart
+    crearPieChart(labels, data, colores);
+
+    // Crear Bar Chart
+    crearBarChart(labels, data, colores);
+}
+
+function crearPieChart(labels, data, colores) {
+    const ctx = document.getElementById('pieChart');
+    
+    // Destruir gráfica anterior si existe
+    if (pieChartInstance) {
+        pieChartInstance.destroy();
+    }
+
+    pieChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colores.backgrounds,
+                borderColor: colores.borders,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 13,
+                            family: 'Inter, sans-serif'
+                        },
+                        color: getComputedStyle(document.documentElement)
+                            .getPropertyValue('--color-texto').trim()
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: $${value.toLocaleString('es-MX', { 
+                                minimumFractionDigits: 2 
+                            })} (${percentage}%)`;
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 13 }
+                }
+            }
+        }
+    });
+}
+
+function crearBarChart(labels, data, colores) {
+    const ctx = document.getElementById('barChart');
+    
+    // Destruir gráfica anterior si existe
+    if (barChartInstance) {
+        barChartInstance.destroy();
+    }
+
+    barChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Ventas ($)',
+                data: data,
+                backgroundColor: colores.backgrounds,
+                borderColor: colores.borders,
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y', // Barras horizontales
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.x || 0;
+                            return `Ventas: $${value.toLocaleString('es-MX', { 
+                                minimumFractionDigits: 2 
+                            })}`;
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 13 }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString('es-MX');
+                        },
+                        color: getComputedStyle(document.documentElement)
+                            .getPropertyValue('--color-texto').trim(),
+                        font: { size: 12 }
+                    },
+                    grid: {
+                        color: getComputedStyle(document.documentElement)
+                            .getPropertyValue('--color-input-border').trim()
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: getComputedStyle(document.documentElement)
+                            .getPropertyValue('--color-texto').trim(),
+                        font: { size: 13 }
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function obtenerColoresPorCategoria(ventasPorCategoria) {
+    const colorMap = {
+        'running': {
+            bg: 'rgba(54, 162, 235, 0.7)',
+            border: 'rgba(54, 162, 235, 1)'
+        },
+        'basketball': {
+            bg: 'rgba(255, 159, 64, 0.7)',
+            border: 'rgba(255, 159, 64, 1)'
+        },
+        'senderismo': {
+            bg: 'rgba(75, 192, 192, 0.7)',
+            border: 'rgba(75, 192, 192, 1)'
+        }
+    };
+
+    const backgrounds = [];
+    const borders = [];
+
+    ventasPorCategoria.forEach(item => {
+        const categoria = item.categoria.toLowerCase();
+        const color = colorMap[categoria] || {
+            bg: 'rgba(201, 203, 207, 0.7)',
+            border: 'rgba(201, 203, 207, 1)'
+        };
+        backgrounds.push(color.bg);
+        borders.push(color.border);
+    });
+
+    return { backgrounds, borders };
+}
+
+function capitalizarCategoria(categoria) {
+    const categoriaMap = {
+        'running': 'Running',
+        'basketball': 'Basketball',
+        'senderismo': 'Senderismo'
+    };
+    return categoriaMap[categoria.toLowerCase()] || categoria;
+}
+
+function mostrarMensajeSinDatos(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    const text = 'Sin datos disponibles';
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '16px Inter, sans-serif';
+    ctx.fillStyle = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-gris').trim();
+    ctx.textAlign = 'center';
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+}
+
+// ============================================
 // FUNCIONES GLOBALES (para onclick en HTML)
 // ============================================
 window.loadProducts = cargarProductos;
@@ -567,17 +911,31 @@ window.removerImagenSeleccionada = removerImagenSeleccionadaHandler;
 // ============================================
 // INICIALIZACIÓN
 // ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    // Renderizar Header al inicio del body
-    const body = document.querySelector('body');
-    body.insertBefore(Header(), body.firstChild);
-    
-    // Renderizar Theme Toggle Button
-    ThemeBtn();
-    
-    // Cargar productos
-    cargarProductos();
-    
-    // Configurar drag and drop
-    setupDragAndDrop();
-});
+async function inicializarPagina() {
+    try {
+        await protectAdminPage();
+
+        // Renderizar Header al inicio del body
+        const body = document.querySelector('body');
+        const header = await Header();
+        body.insertBefore(header, body.firstChild);
+        
+        // Renderizar Theme Toggle Button
+        ThemeBtn();
+
+        // Cargar estadísticas
+        await cargarEstadisticas();
+        
+        // Cargar productos
+        await cargarProductos();
+        
+        // Configurar drag and drop
+        setupDragAndDrop();
+    } catch (error) {
+        console.error('Error al inicializar página:', error);
+        mostrarAlertaError('Error al cargar la página. Por favor, recarga.');
+    }
+}
+
+// Llamar a la función de inicialización cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', inicializarPagina);

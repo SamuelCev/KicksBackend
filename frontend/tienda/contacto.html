@@ -9,6 +9,7 @@
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/globals.css">
   <link rel="stylesheet" href="../css/contacto.css">
+  <link rel="stylesheet" href="../css/chat.css">
   
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -156,6 +157,51 @@
       </div>
     </div>
   </main>
+
+  <!-- Botón flotante para abrir el chat -->
+  <button class="chat-fab" id="chatFab">
+        <span class="chat-fab-icon" id="chatFabIcon"></span>
+  </button>
+
+  <!-- Modal del chat -->
+  <div class="chat-modal" id="chatModal">
+        <div class="chat-container">
+            
+            <!-- Header del chat -->
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <span class="chat-icon" id="chatHeaderIcon"></span>
+                    <h3>Kicksy</h3>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="btn-icon" id="clearChat" title="Limpiar conversación">
+                        <span id="clearChat"></span>
+                    </button>
+                    <button class="btn-icon" id="closeChat" title="Cerrar">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages"></div>
+
+            <div class="chat-input-container">
+                <form id="chatForm" class="chat-form">
+                    <textarea 
+                        id="messageInput" 
+                        class="chat-input" 
+                        placeholder="Escribe tu mensaje..."
+                        rows="1"
+                        required
+                    ></textarea>
+                    <button type="submit" class="chat-send-btn">
+                        ➤
+                    </button>
+                </form>
+            </div>
+
+        </div>
+  </div>
 
   <!-- Scripts -->
   <script type="module">

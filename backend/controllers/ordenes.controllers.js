@@ -30,14 +30,17 @@ exports.createOrder = async (req, res) => {
     let impuesto = 0;
     let gasto_envio = 0;
     let total = 0;
-    let text = '';
 
     try {
         // Calcular el subtotal del carrito
         const cartItems = await OrderModel.getCartItemsWithPrices(userId);
 
+        if (!cartItems || cartItems.length === 0) {
+            return res.status(400).json({ message: "El carrito está vacío" });
+        }
+
         for (const item of cartItems) {
-            let precioUnitario = item.precio;
+            let precioUnitario = parseFloat(item.precio);
             if (item.hasDescuento) {
                 precioUnitario = precioUnitario - (precioUnitario * item.descuento);
             }
@@ -47,10 +50,10 @@ exports.createOrder = async (req, res) => {
         if (pais === 'mexico') {
             impuesto = subtotal * 0.16;
             gasto_envio = 120;
-        }else if (pais === 'usa') {
+        } else if (pais === 'usa') {
             impuesto = subtotal * 0.07;
             gasto_envio = 180;
-        }else if (pais === 'españa') {
+        } else if (pais === 'españa') {
             impuesto = subtotal * 0.21;
             gasto_envio = 150;
         }
@@ -80,6 +83,9 @@ exports.createOrder = async (req, res) => {
         });
         const orderId = orderResult.insertId;
 
+        // Preparar artículos para el PDF
+        const articulosParaPDF = [];
+
         // Insertar los ítems de la orden y actualizar el stock
         for (const item of cartItems) {
             let precioUnitario = item.precio;
@@ -100,28 +106,27 @@ exports.createOrder = async (req, res) => {
                 categoria
             });
 
-            text += `<li><strong>${item.cantidad}x</strong> ${productoInfo.nombre} - <strong>$${precioUnitario}</strong></li>`;
+            // Agregar al array para el PDF
+            articulosParaPDF.push({
+                nombre: productoInfo.nombre,
+                cantidad: parseInt(item.cantidad),
+                precioUnitario: parseFloat(precioUnitario)
+            });
         }
-        // Vaciar el carrito
-        await OrderModel.clearUserCart(userId);
 
         const pdfPath = await generarReciboPDF({
-            orderId,
-            userId,
-            cartItems,
-            subtotal,
-            impuesto,
-            gasto_envio,
-            total,
-            cupon,
-            nombre_envio,
-            direccion_envio,
-            ciudad,
-            codigo_postal,
-            pais,
-            telefono
+            fecha: new Date(),
+            nombreCliente: nombre_envio,
+            articulos: articulosParaPDF,
+            subtotal: subtotal,
+            impuestos: impuesto,
+            gastosEnvio: gasto_envio,
+            nombreCupon: cupon || null,
+            porcentajeDescuento: cupon === 'DESCUENTO10' ? 10 : 0,
+            total: total
         });
 
+        // Enviar email con PDF
         await sendMailWithPdf({
             to: userEmail,
             subject: 'Confirmación de tu orden en KICKS',
@@ -129,10 +134,20 @@ exports.createOrder = async (req, res) => {
             pdfName: `Recibo_Orden_${orderId}.pdf`
         });
 
-        res.status(201).json({ message: "Orden creada exitosamente", orderId });
+        await OrderModel.clearUserCart(userId);
+
+        res.status(201).json({ 
+            ok: true,
+            message: "Orden creada exitosamente", 
+            orderId 
+        });
     } catch (error) {
         console.error("Error al crear la orden:", error);
-        res.status(500).json({ message: "Error al crear la orden" });
+        res.status(500).json({ 
+            ok: false,
+            message: "Error al crear la orden",
+            error: error.message 
+        });
     }
 }
 

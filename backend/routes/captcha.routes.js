@@ -8,7 +8,7 @@ const router = express.Router();
  * /api/captcha/generate:
  *   get:
  *     summary: Generar un nuevo CAPTCHA
- *     description: Genera un CAPTCHA matemático simple para validación humana
+ *     description: Genera un CAPTCHA de imagen con texto distorsionado para validación humana
  *     tags:
  *       - Captcha
  *     responses:
@@ -23,10 +23,10 @@ const router = express.Router();
  *                   type: string
  *                   description: ID único del CAPTCHA generado
  *                   example: "abc123def456"
- *                 question:
+ *                 image:
  *                   type: string
- *                   description: Pregunta matemática del CAPTCHA
- *                   example: "¿Cuánto es 5 + 3?"
+ *                   description: Imagen del CAPTCHA en formato base64 (data URL)
+ *                   example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
  *       500:
  *         description: Error al generar CAPTCHA
  *         content:
@@ -45,7 +45,7 @@ router.get('/generate', getCaptcha);
  * /api/captcha/validate:
  *   post:
  *     summary: Validar respuesta del CAPTCHA
- *     description: Verifica si la respuesta proporcionada es correcta para el CAPTCHA generado
+ *     description: Verifica si el texto ingresado coincide con el texto del CAPTCHA de imagen generado
  *     tags:
  *       - Captcha
  *     requestBody:
@@ -63,9 +63,9 @@ router.get('/generate', getCaptcha);
  *                 description: ID del CAPTCHA generado previamente
  *                 example: "abc123def456"
  *               answer:
- *                 type: number
- *                 description: Respuesta numérica del usuario
- *                 example: 8
+ *                 type: string
+ *                 description: Texto ingresado por el usuario para validar el CAPTCHA
+ *                 example: "A3B7K9"
  *     responses:
  *       200:
  *         description: CAPTCHA válido

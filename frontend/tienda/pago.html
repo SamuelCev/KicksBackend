@@ -164,9 +164,13 @@
             <div class="form-section">
               <h2 class="section-title">Cupón de Descuento (Opcional)</h2>
               <div class="form-row">
-                <div class="form-group">
+                <div class="form-group" style="flex: 1;">
                   <input type="text" id="cupon" name="cupon" placeholder="Ingresa tu código">
+                  <p id="cupon-mensaje" style="margin-top: 8px; font-size: 0.9rem; font-weight: 500; min-height: 20px;"></p>
                 </div>
+                <button type="button" id="btn-validar-cupon" class="btn" style="height: fit-content; padding: 12px 24px; margin-top: 0;">
+                  Aplicar
+                </button>
               </div>
             </div>
           </form>

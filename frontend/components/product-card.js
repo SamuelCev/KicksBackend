@@ -1,7 +1,7 @@
 /**
  * Componente ProductCard
  * Crea una tarjeta de producto reutilizable con toda la funcionalidad necesaria
- * 
+ *
  * @param {Object} producto - Objeto con los datos del producto
  * @param {string} producto.id - ID único del producto
  * @param {string} producto.nombre - Nombre del producto
@@ -13,6 +13,9 @@
  * @param {number} producto.cantidad - Cantidad disponible en stock
  * @returns {HTMLElement} - Elemento DOM de la tarjeta del producto
  */
+
+import { obtenerUrlImagen } from '../js/utils/utilities.js';
+
 export function ProductCard(producto) {
   const {
     id,
@@ -25,10 +28,13 @@ export function ProductCard(producto) {
     categoria = 'General',
     esNuevo = false,
     stock = 0
-  } = producto;
+  } = producto;          
 
   // Usar imagenCompleta si está disponible, sino usar imagen
-  const imagenUrl = imagenCompleta || imagen;
+  const imagenPath = imagenCompleta || imagen;
+  const imagenUrl = obtenerUrlImagen(imagenPath);
+
+  console.log('Imagen URL del producto:', imagenUrl);
   
   // Convertir precio y descuento a números (vienen como strings de MySQL)
   const precioOriginal = parseFloat(precio);
@@ -112,7 +118,9 @@ export function ProductCard(producto) {
   if (!estaAgotado) {
     cartBtn.addEventListener('click', (e) => {
       e.stopPropagation(); // Evitar que se active el click del card
-      addToCart(id, nombre, precioNum, imagenUrl);
+      // Usar el precio con descuento si existe, sino el precio original
+      const precioFinal = tieneDescuento ? precioDescuento : precioOriginal;
+      addToCartHandler(id, nombre, precioFinal, imagenUrl);
     });
   }
 
@@ -126,23 +134,25 @@ export function ProductCard(producto) {
  * @param {number} productPrice - Precio del producto
  * @param {string} productImage - URL de la imagen del producto
  */
-async function addToCart(productId, productName, productPrice, productImage) {
+async function addToCartHandler(productId, productName, productPrice, productImage) {
   try {
-    // Importar dinámicamente la función de API del carrito
-    const { agregarAlCarrito } = await import('../js/api/carrito.js');
-    
+    // Importar la función addToCart desde auth.js y mostrarNotificacion desde utilities.js
+    const { addToCart } = await import('../js/utils/auth.js');
+    const { mostrarNotificacion } = await import('../js/utils/utilities.js');
+
     // Agregar al carrito (cantidad por defecto: 1)
-    await agregarAlCarrito(productId, 1, productName);
-    
-    console.log('Producto agregado al carrito:', {
-      id: productId,
-      nombre: productName,
-      precio: productPrice,
-      imagen: productImage,
-      cantidad: 1
-    });
-    
+    const result = await addToCart(productId, 1);
+
+    if (result.success) {
+      mostrarNotificacion(`${productName} agregado al carrito`, 'success');
+
+    } else {
+      mostrarNotificacion('Error al agregar producto al carrito', 'error');
+      console.error('Error al agregar producto:', result.error);
+    }
+
   } catch (error) {
+    mostrarNotificacion('Error al agregar producto al carrito', 'error');
     console.error('Error al agregar producto al carrito:', error);
   }
 }
