@@ -861,7 +861,7 @@ export async function generateCaptcha() {
             return { 
                 success: true, 
                 captchaId: response.captchaId,
-                question: response.question 
+                image: response.image 
             };
         } else {
             return { 

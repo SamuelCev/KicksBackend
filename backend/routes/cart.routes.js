@@ -1,7 +1,36 @@
 const express = require('express');
-const { getCartByUserId, addItemToCart, removeItemFromCart, updateItemQuantity } = require('../controllers/cart.controllers');
+const { getCartByUserId, addItemToCart, removeItemFromCart, updateItemQuantity, getCartItemCount } = require('../controllers/cart.controllers');
 const { loginRequired } = require('../middleware/auth.middleware');
 const router = express.Router();
+
+/**
+ * @swagger
+ * /api/cart/count:
+ *   get:
+ *     summary: Obtener número de artículos distintos en el carrito
+ *     description: Retorna la cantidad de productos distintos (no instancias) que tiene el usuario en su carrito
+ *     tags:
+ *       - Carrito
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Conteo obtenido exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   description: Número de productos distintos en el carrito
+ *                   example: 3
+ *       401:
+ *         description: No autenticado
+ *       500:
+ *         description: Error del servidor
+ */
+router.get('/count', loginRequired, getCartItemCount);
 
 /**
  * @swagger

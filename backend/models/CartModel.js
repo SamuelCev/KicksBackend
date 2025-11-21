@@ -13,6 +13,19 @@ const getCartItemsByUserId = async (userId) => {
     }
 };
 
+const getItemByProductId = async (userId, productId) => {
+    try {
+        const [items] = await pool.query(
+            'SELECT * FROM carrito_items WHERE usuario_id = ? AND producto_id = ?',
+            [userId, productId]
+        );
+        return items.length > 0 ? items[0] : null;
+    } catch (error) {
+        console.error("Error en CartModel.getItemByProductId:", error);
+        throw error;
+    }
+};
+
 const addItem = async (userId, productId, cantidad) => {
     try {
         const [result] = await pool.query(
@@ -22,6 +35,19 @@ const addItem = async (userId, productId, cantidad) => {
         return result;
     } catch (error) {
         console.error("Error en CartModel.addItem:", error);
+        throw error;
+    }
+};
+
+const incrementItemQuantity = async (itemId, cantidad) => {
+    try {
+        const [result] = await pool.query(
+            'UPDATE carrito_items SET cantidad = cantidad + ? WHERE id = ?',
+            [cantidad, itemId]
+        );
+        return result;
+    } catch (error) {
+        console.error("Error en CartModel.incrementItemQuantity:", error);
         throw error;
     }
 };
@@ -65,10 +91,26 @@ const updateItemQuantity = async (itemId, userId, cantidad) => {
     }
 };
 
+const getCartItemCount = async (userId) => {
+    try {
+        const [result] = await pool.query(
+            'SELECT COUNT(*) as count FROM carrito_items WHERE usuario_id = ?',
+            [userId]
+        );
+        return result[0].count;
+    } catch (error) {
+        console.error("Error en CartModel.getCartItemCount:", error);
+        throw error;
+    }
+};
+
 module.exports = {
     getCartItemsByUserId,
     addItem,
     removeItem,
     getItemById,
-    updateItemQuantity
+    updateItemQuantity,
+    getItemByProductId,
+    incrementItemQuantity,
+    getCartItemCount
 };
