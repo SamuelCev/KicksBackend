@@ -1,3 +1,8 @@
+import { register, redirectIfAuthenticated } from "./utils/auth.js"; 
+import { getSwalConfig } from "./utils/utilities.js";
+
+await redirectIfAuthenticated();
+
 // Obtener el formulario
 const registroForm = document.getElementById('registro-form');
 
@@ -6,31 +11,63 @@ registroForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   
   // Obtener los valores
-  const nombre = document.getElementById('nombre').value;
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const confirmPassword = document.getElementById('confirm-password').value;
+  const nombre = document.getElementById('nombre');
+  const email = document.getElementById('email');
+  const password = document.getElementById('password');
+  const confirmPassword = document.getElementById('confirm-password');
+
+  if (password.value !== confirmPassword.value) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Las contraseñas no coinciden. Intenta de nuevo.',
+      ...getSwalConfig()
+    });
+    return;
+  }
   
-  // Aquí irá tu lógica para llamar al API
-  console.log('Datos del registro:', { nombre, email, password, confirmPassword });
-  
+    
   try {
-    // TODO: Hacer fetch a tu API
-    // const response = await fetch('http://tu-api.com/registro', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ nombre, email, password })
-    // });
-    
-    // Por ahora simulamos un registro exitoso
-    alert('Registro exitoso! (Aquí conectarás con tu API)');
-    
-    // Redirigir al login o dashboard
-    // window.location.href = 'login.html';
-    
+    const resultado = await register(nombre.value, email.value, password.value, confirmPassword.value);
+  
+    if (resultado.success) {
+      // Login exitoso
+      Swal.fire({
+        icon: 'success',
+        title: 'Cuenta creada Exitosamente!',
+        text: `Hola ${resultado.user.nombre}`,
+        showConfirmButton: false,
+        timer: 1500,
+        ...getSwalConfig()
+      });
+
+      // Redirigir después de 1.5 segundos
+      setTimeout(() => {
+        window.location.href = '../index.html';
+      }, 1500);
+
+    } else {
+      // Login fallido
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de registro',
+        text: resultado.error || 'Error al registrar usuario',
+        ...getSwalConfig()
+      });
+    }  
+    nombre.value = '';
+    email.value = '';
+    password.value = '';
+    confirmPassword.value = '';
+
   } catch (error) {
     console.error('Error en el registro:', error);
-    alert('Error al registrarse. Intenta de nuevo.');
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Ocurrió un error inesperado. Intenta de nuevo.',
+      ...getSwalConfig()
+    });
   }
 });
 

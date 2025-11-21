@@ -1,0 +1,187 @@
+/* ============================================
+   RECUPERAR CONTRASEÑA
+   ============================================ */
+
+.recovery-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  padding-top: 100px; /* Espacio para el header */
+}
+
+.recovery-card {
+  background-color: var(--color-fondo);
+  border: 2px solid var(--color-input-border);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.recovery-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.recovery-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--color-texto);
+}
+
+.recovery-header p {
+  color: var(--color-secundario);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.recovery-header strong {
+  color: var(--color-acento);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* ============================================
+   PASOS
+   ============================================ */
+
+.recovery-step {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.recovery-step.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   FORMULARIO
+   ============================================ */
+
+.recovery-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-texto);
+}
+
+.btn-full {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Hint de contraseña */
+.password-hint {
+  display: block;
+  color: var(--color-secundario);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+/* ============================================
+   LINKS Y BOTONES SECUNDARIOS
+   ============================================ */
+
+.link-back {
+  display: block;
+  text-align: center;
+  margin-top: 24px;
+  color: var(--color-acento);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: opacity 0.3s ease;
+}
+
+.link-back:hover {
+  opacity: 0.7;
+}
+
+.recovery-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+  align-items: center;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--color-acento);
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+  padding: 4px 8px;
+}
+
+.link-btn:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media screen and (max-width: 570px) {
+  .recovery-container {
+    padding: 20px;
+    padding-top: 80px;
+  }
+
+  .recovery-card {
+    padding: 24px;
+  }
+
+  .recovery-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .recovery-header p {
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .recovery-card {
+    padding: 20px;
+  }
+
+  .recovery-header {
+    margin-bottom: 24px;
+  }
+
+  .recovery-form {
+    gap: 16px;
+  }
+}

@@ -9,6 +9,7 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD || "mi_password",
   database: process.env.DB_NAME || "mi_app_db",
   port: process.env.DB_PORT || 3306,
+  timezone: '-06:00'
 });
 
 

@@ -6,6 +6,10 @@
   <link rel="icon" href="../assets/img/favicon.ico" type="image/x-icon">
   <title>Registro - KICKS</title>
   
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/globals.css">
   <link rel="stylesheet" href="../css/registro.css">
@@ -121,10 +125,10 @@
   
     ThemeBtn();
   
-    const header = Header();
+    const header = await Header();
     document.body.insertBefore(header, document.body.firstChild);
   </script>
-  <script src="../js/registro.js"></script>
+  <script type="module" src="../js/registro.js"></script>
 
 </body>
 </html>
