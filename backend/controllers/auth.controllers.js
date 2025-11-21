@@ -11,7 +11,7 @@ const LOCKOUT_TIME=5*60*1000;//5minutos (en milisegundos)
 setInterval(()=>{
     const now=Date.now();
     for(const [email,data]of loginAttempts){
-        if(attemptData.lockedUntil&&now>attemptData.lockedUntil){
+        if(data.lockedUntil&&now>data.lockedUntil){
             loginAttempts.delete(email);
         }
     }
@@ -137,11 +137,11 @@ exports.login = async (req, res) => {
     //Verificacion si la cuenta está bloqueada
     const lockStatus=isAccountLocked(email);
     if(lockStatus&&lockStatus.locked){
-        const minutes=Math.floor(lookStatus.remainingTime/60);
-        const seconds=lookStatus.remainingTime%60;
+        const minutes=Math.floor(lockStatus.remainingTime/60);
+        const seconds=lockStatus.remainingTime%60;
         return res.status(429).json({
             message: `Cuenta bloqueada. Intente nuevamente en ${minutes} minutos y ${seconds} segundos.`,
-            remainingTime: lookStatus.remainingTime,
+            remainingTime: lockStatus.remainingTime,
             lockedUntil:Date.now()+(lockStatus.remainingTime*1000)
         });
     }
