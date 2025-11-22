@@ -192,8 +192,8 @@ exports.login = async (req, res) => {
         // Enviar el token como cookie httpOnly
         res.cookie('token', token, {
             httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
+            secure: true,
+            sameSite: 'none',
             maxAge: 60 * 60 * 1000 // 1 hora
         });
         res.json({
@@ -322,8 +322,8 @@ exports.logout = (req, res) => {
         // Eliminar la cookie del token
         res.clearCookie('token', {
             httpOnly: true,
-            secure: false,
-            sameSite: 'lax'
+            secure: true,
+            sameSite: 'none'
         });
         
         res.json({ message: "Logout exitoso" });
