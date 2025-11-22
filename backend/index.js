@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], 
+    origin: ['https://kicks-zeta.vercel.app/'], 
     credentials: true, 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
