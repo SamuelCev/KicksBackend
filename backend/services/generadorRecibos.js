@@ -319,7 +319,13 @@ async function generarReciboPDF(datosRecibo) {
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
     
-    const pdfPath = path.join(__dirname, '..', 'Recibos', 'recibo.pdf');
+    // Crear directorio Recibos si no existe
+    const recibosDir = path.join(__dirname, '..', 'Recibos');
+    if (!fs.existsSync(recibosDir)) {
+      fs.mkdirSync(recibosDir, { recursive: true });
+    }
+    
+    const pdfPath = path.join(recibosDir, 'recibo.pdf');
     
     await page.pdf({
       path: pdfPath,
