@@ -9,14 +9,17 @@ const transporter = nodemailer.createTransport({
     user: process.env.MAIL_USER ||  'nickcinq4@gmail.com',
     pass: process.env.MAIL_PASS || 'mlai qujf bfoi gbbt',
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
+  tls: {
+    rejectUnauthorized: false
+  },
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
 });
 
 async function sendMailWithPdf({ to, subject, text, pdfPath, pdfName }) {
   const mailOptions = {
-    from: `"Kicks" <${process.env.MAIL_USER}>`,
+    from: `"Kicks" <${process.env.MAIL_USER || 'nickcinq4@gmail.com'}>`,
     to,
     subject,
     html: `
