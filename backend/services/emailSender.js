@@ -2,11 +2,20 @@ const nodemailer = require('nodemailer');
 const path = require('path');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.MAIL_USER ||  'nickcinq4@gmail.com',
     pass: process.env.MAIL_PASS || 'mlai qujf bfoi gbbt',
   },
+  tls: {
+    rejectUnauthorized: true,
+    minVersion: 'TLSv1.2'
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
 });
 
 async function sendMailWithPdf({ to, subject, text, pdfPath, pdfName }) {
